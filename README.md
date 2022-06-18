@@ -29,11 +29,18 @@ git pull
 
 ## Install Python
 
-To run the software you will need a Python environment. Check what is available on physics self service or install [Python 3.10 for windows](https://docs.python.org/3/using/windows.html). 
+To run the software you will need a Python environment. Check what is available on physics self service or install Python 3.10 for windows. (https://docs.python.org/3/using/windows.html). 
+
+You can either install directly from Microsoft Store or the full installer on the [Python foundation](https://www.python.org/downloads/). 
 
 I recommend not to use the Anaconda environment](https://docs.anaconda.com/anaconda/install/windows/), since most recent modules will be harder to install. 
 
 ## Install Python modules
+
+First upgrade the Python module manager pip :
+```
+pip install --upgrade pip
+```
 
 Several Python modules are needed to run the software. To do so open a command line console and enter : 
 
@@ -70,7 +77,7 @@ or, for jupyterlab
 python -m jupyterlab
 ```
 
-You can find an example of jupyter notebook with treatment of tdms data in Examples.
+You can find an example of jupyter notebook with treatment of Rod data in Examples.
 
 ## Authors and acknowledgment
 TODO
