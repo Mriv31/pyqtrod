@@ -6,6 +6,7 @@ from scipy import signal
 from PyQtWorker import PyQtWorker
 import pyqtgraph.opengl as gl
 from pyqtgraph import mkColor
+from functools import partial
 
 
 
@@ -35,7 +36,6 @@ class FKtraj(QtWidgets.QWidget):
         self.startbox.setMaximum(self.NITab.NIf.datasize/self.NITab.NIf.freq)
 
 
-        self.w = self.NITab.plot3D()
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_rod)
 
@@ -65,6 +65,7 @@ class FKtraj(QtWidgets.QWidget):
         NITab.add_tool_widget(self,"FKtraj")
 
 
+
     def set_conv_window(self,x):
         self.convolutionwindow = x
 
@@ -77,8 +78,12 @@ class FKtraj(QtWidgets.QWidget):
 
     def set_start(self,x):
         self.start = int((x-self.NITab.NIf.time_off)*self.NITab.NIf.freq)
+        if self.start < 0 :
+            self.start = 0
     def set_stop(self,x):
         self.stop = int((x-self.NITab.NIf.time_off)*self.NITab.NIf.freq)
+        if self.stop >= self.NITab.NIf.datasize :
+            self.stop = self.NITab.NIf.datasize-1
 
     def set_start_stop_visible(self):
         xa,ya,xb,yb = self.NITab.NIv.get_lim()
@@ -111,13 +116,18 @@ class FKtraj(QtWidgets.QWidget):
         # Execute
         self.NITab.threadpool.start(worker)
     def main_comp(self, progress_callback):
-
+        self.stopbutton.setEnabled(False)
+        self.timer.stop()
+        self.convolvebutton.setEnabled(False)
         channels = []
+        print(self.start,self.stop)
         for i in range(4):
             channels.append(self.NITab.NIf.channels[i][self.start:self.stop]*self.NITab.NIf.a[i]+self.NITab.NIf.b[i])
         pol_ind = self.NITab.NIf.get_pol_ind(["0","90","45","135"])
         c0,c90,c45,c135 = [channels[pol_ind[i]] for i in range(len(pol_ind))]
         print(pol_ind)
+        progress_callback.emit(30)
+
 
         alpha = np.arcsin(1.3/1.51)
         A=1/6-1/4*np.cos(alpha)+1/12*np.cos(alpha)**3
@@ -133,6 +143,8 @@ class FKtraj(QtWidgets.QWidget):
         #theta2 = np.arcsin(np.sqrt((c45-c135)/(2*Itots2thet*C*ss)))
 
         phi = np.unwrap(phi,period=np.pi)
+        progress_callback.emit(70)
+
 
         self.v1 = np.column_stack((np.sin(theta1)*np.cos(phi),np.sin(theta1)*np.sin(phi),np.cos(theta1)))
         #v2 = np.array([np.sin(theta0)*np.cos(phi0),np.sin(theta0)*np.sin(phi0),np.cos(theta0)])
@@ -143,6 +155,7 @@ class FKtraj(QtWidgets.QWidget):
         self.samplesize = len(self.phi)
         self.index = 0
         self.convolvebutton.setEnabled(True)
+        progress_callback.emit(100)
         return self.v1
 
     def update_rod(self):
@@ -167,10 +180,21 @@ class FKtraj(QtWidgets.QWidget):
     def progress_fn(self,number):
         self.progressBar.setValue(number)
 
+    def wdestroyed(self,wpg):
+        if (self.winpg == wpg): #if destroyed current window
+            self.timer.stop()
+            self.stopbutton.setEnabled(False)
+
+
+
     def display_result(self,res):
         if (len(self.phi) > 2e6):
             return
-        self.w.clear()
+
+        self.winpg,self.w = self.NITab.plot3D(title="3D plot - FKtraj")
+
+        self.winpg.destroyed.connect(partial(self.wdestroyed,self.winpg))
+
         color=mkColor('r')
         color.setAlphaF(0.1)
         self.plt = gl.GLScatterPlotItem(pos=self.v1,size=0.01,pxMode=False,color=color)
