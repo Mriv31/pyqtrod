@@ -1,0 +1,3 @@
+{
+    "files": ["PyQtRod.py","Helpers.py","Modules/FKtraj.py","Modules/FreqFFT.ui","NITab.py","form.ui","NIfile.py","Modules/FreqFFT.py","Series.py","NITab.ui","Modules/FKtraj.ui","Modules/ComputeCoeffs.ui","NIVisualizator.py","Modules/ComputeCoeffs.py","PyQtWorker.py"]
+}
