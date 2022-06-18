@@ -1,0 +1,10 @@
+pyqt6
+pyqt6-charts
+superqt
+numpy
+pyqtgraph
+nptdms
+pathlib
+scipy
+scikit-learn
+PyOpenGL
