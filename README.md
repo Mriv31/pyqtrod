@@ -18,7 +18,7 @@ git clone https://gitlab.physics.ox.ac.uk/rieu/PyQtRod.git
 
 You will be asked to enter your physics credential. If there are any access problem, ask me and I will add permission for you to clone.
 
-## Update the GIT directory
+## Update the GIT directory
 
 To update any modification I will have made to the software, just enter from the command line :
 
@@ -33,7 +33,7 @@ To run the software you will need a Python environment. Check what is available 
 
 I recommend not to use the Anaconda environment](https://docs.anaconda.com/anaconda/install/windows/), since most recent modules will be harder to install. 
 
-##Install Python modules
+## Install Python modules
 
 Several Python modules are needed to run the software. To do so open a command line console and enter : 
 
