@@ -215,7 +215,8 @@ class NITab(QtWidgets.QMainWindow):
           w.setCameraPosition(distance=40)
           winpg.setWidget(w)
           winpg.show()
-          return w
+          winpg.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+          return winpg,w
 
 class ModuleDialog(QtWidgets.QDialog):
      def __init__(self, name, stringlist=None, checked=False, icon=None, parent=None):

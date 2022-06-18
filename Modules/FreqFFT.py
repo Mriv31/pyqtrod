@@ -55,8 +55,12 @@ class FreqFFT(QtWidgets.QWidget):
         self.overlap = x
     def set_start(self,x):
         self.start = int((x-self.NITab.NIf.time_off)*self.NITab.NIf.freq)
+        if self.start < 0 :
+            self.start = 0
     def set_stop(self,x):
         self.stop = int((x-self.NITab.NIf.time_off)*self.NITab.NIf.freq)
+        if self.stop >= self.NITab.NIf.datasize :
+            self.stop = self.NITab.NIf.datasize-1
 
     def set_start_stop_visible(self):
         xa,ya,xb,yb = self.NITab.NIv.get_lim()
@@ -77,6 +81,7 @@ class FreqFFT(QtWidgets.QWidget):
         self.NITab.threadpool.start(worker)
     def main_comp(self, progress_callback):
         channels = []
+
         for i in range(4):
             channels.append(self.NITab.NIf.channels[i][self.start:self.stop]*self.NITab.NIf.a[i]+self.NITab.NIf.b[i])
         pol_ind = self.NITab.NIf.get_pol_ind(["0","90","45","135"])
@@ -95,6 +100,7 @@ class FreqFFT(QtWidgets.QWidget):
             max_freq.append(f0[np.argmax(Pxx_den0)])
             xarr.append((self.start + self.overlap*i)/self.NITab.NIf.freq)
             progress_callback.emit(int(i/n_seg*100))
+        progress_callback.emit(100)
         return xarr,max_freq
 
     def progress_fn(self,number):
