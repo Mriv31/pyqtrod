@@ -1,0 +1,34 @@
+xtick.color : black
+ytick.color : black
+axes.labelcolor : black
+axes.edgecolor : black
+axes.prop_cycle : cycler('color',['orange','lightseagreen', 'purple','777777','FBC15E'])
+
+mathtext.fontset : custom
+mathtext.rm : Arial
+mathtext.it : Arial
+mathtext.bf : Arial
+
+font.sans-serif : Arial
+text.latex.preamble : [r'\boldmath']
+
+patch.linewidth : 0
+
+axes.spines.left : True
+axes.spines.bottom : True
+axes.spines.right : True
+axes.spines.top : True
+
+axes.labelweight : bold
+axes.titleweight : bold
+font.weight : bold
+
+
+axes.facecolor : white
+grid.color : white
+figure.dpi : 100
+
+font.size : 15
+font.family : sans
+
+errorbar.capsize : 2

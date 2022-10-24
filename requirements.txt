@@ -8,3 +8,4 @@ pathlib
 scipy
 scikit-learn
 PyOpenGL
+matplotlib

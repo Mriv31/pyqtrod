@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from nptdms import TdmsWriter, ChannelObject, TdmsFile
+from corr_matrix import *
 #import cupy as cp
 
 
@@ -28,6 +29,13 @@ class NIfile:
         self.dec_average = 1
         self.a=[1,1,1,1]
         self.b=[0,0,0,0]
+        self.matcor = T_Icor_Matrix() #0,90,45,135 (45 is reflected)
+
+        inds = self.get_pol_ind(["0","90","45","135"])
+        P = np.zeros([4,4])
+        for i in range(4):
+            P[i,inds[i]]=1
+        self.matcor = np.dot(np.linalg.inv(P),np.dot(self.matcor,P))
 
         self.init_data_share(dec)
 
@@ -48,10 +56,8 @@ class NIfile:
         if self.ld % 2 ==1:
             self.ld -= 1 #always even
 
-        self.data = [np.zeros([self.ld,3]) for i in range(self.n_signals)] #references to the whole data that correspond to the channels
-        self.xs = [self.data[i][:,0] for i in range(self.n_signals)] #Aliases for x of channels
-        self.ys = [self.data[i][:,1] for i in range(self.n_signals)] #Aliases for y of channels
-
+        self.data = np.zeros([self.n_signals,self.ld]) #references to the whole data that correspond to the channels
+        self.xs = np.zeros(self.ld)
         self.update_data_from_file(time)
     def get_pol_ind(self,listpol):
         indlist = []
@@ -76,7 +82,7 @@ class NIfile:
 
 
 
-    def update_data_from_file(self,time,norep=0):
+    def update_data_from_file_old(self,time,norep=0):
 
 
         center = self.time_to_index_in_file([time])[0]
@@ -84,7 +90,6 @@ class NIfile:
             center = self.ld/2*self.dec
         if (center + self.dec*self.ld/2 > self.datasize):
             center = self.datasize - self.ld/2*self.dec
-        print(center,self.center)
         if (center == self.center and norep == 1):
             return 1
 
@@ -97,15 +102,49 @@ class NIfile:
         imax = int(center + self.ld/2*self.dec)
         for i in range(self.n_signals):
                 if self.dec == 1:
-                    self.ys[i][:] = self.b[i]+self.a[i]*self.channels[i][imin:imin+self.ld]
+                    self.data[i,:] = self.b[i]+self.a[i]*self.channels[i][imin:imin+self.ld]
                 elif self.dec_average:
-                    self.ys[i][:] = self.b[i]+self.a[i]*np.mean(self.channels[i][imin:imin+self.ld*self.dec].reshape([self.ld,self.dec]),axis=1)
+                    self.data[i,:] = self.b[i]+self.a[i]*np.mean(self.channels[i][imin:imin+self.ld*self.dec].reshape([self.ld,self.dec]),axis=1)
                 else:
-                    self.ys[i][:] = self.b[i]+self.a[i]*self.channels[i][imin:imin+self.ld*self.dec:self.dec]
-                self.xs[i][:] = self.time_off + self.time_inc * np.arange(imin,imin+self.ld*self.dec,self.dec)
+                    self.data[i,:] = self.b[i]+self.a[i]*self.channels[i][imin:imin+self.ld*self.dec:self.dec]
+        self.xs[:] = self.time_off + self.time_inc * np.arange(imin,imin+self.ld*self.dec,self.dec)
         self.indstart = imin  #starting index of the file where the signal is read
-        self.minymem = np.min(np.asarray(self.ys))
-        self.maxymem = np.max(np.asarray(self.ys))
+        self.minymem = np.min(np.asarray(self.data[i,:]))
+        self.maxymem = np.max(np.asarray(self.data[i,:]))
+        self.minxmem = np.min(np.asarray(self.xs))
+        self.maxxmem = np.max(np.asarray(self.xs))
+        return 0
+
+    def update_data_from_file(self,time,norep=0):
+
+
+        center = self.time_to_index_in_file([time])[0]
+        if (center < self.ld/2*self.dec):
+            center = self.ld/2*self.dec
+        if (center + self.dec*self.ld/2 > self.datasize):
+            center = self.datasize - self.ld/2*self.dec
+        if (center == self.center and norep == 1):
+            return 1
+
+        if time == -2:
+            center = self.center
+
+
+        self.center = center
+        imin = int(center - self.ld/2*self.dec)
+        imax = int(center + self.ld/2*self.dec)
+        for i in range(self.n_signals):
+                if self.dec == 1:
+                    self.data[i,:] = self.b[i]+self.a[i]*self.channels[i][imin:imin+self.ld]
+                elif self.dec_average:
+                    self.data[i,:] = self.b[i]+self.a[i]*np.mean(self.channels[i][imin:imin+self.ld*self.dec].reshape([self.ld,self.dec]),axis=1)
+                else:
+                    self.data[i,:] = self.b[i]+self.a[i]*self.channels[i][imin:imin+self.ld*self.dec:self.dec]
+        self.xs[:] = self.time_off + self.time_inc * np.arange(imin,imin+self.ld*self.dec,self.dec)
+        self.data = np.dot(self.matcor,self.data)
+        self.indstart = imin  #starting index of the file where the signal is read
+        self.minymem = np.min(np.asarray(self.data[i,:]))
+        self.maxymem = np.max(np.asarray(self.data[i,:]))
         self.minxmem = np.min(np.asarray(self.xs))
         self.maxxmem = np.max(np.asarray(self.xs))
         return 0
@@ -131,6 +170,6 @@ class NIfile:
         return ret
     def get_min_max_partial(self,xl):
         inds = self.time_to_index_in_mem(xl)
-        mins = [np.min(self.ys[i][inds[0]:inds[1]]) for i in range(self.n_signals)]
-        maxs = [np.max(self.ys[i][inds[0]:inds[1]]) for i in range(self.n_signals)]
+        mins = [np.min(self.data[i,inds[0]:inds[1]]) for i in range(self.n_signals)]
+        maxs = [np.max(self.data[i,inds[0]:inds[1]]) for i in range(self.n_signals)]
         return np.min(mins),np.max(maxs)

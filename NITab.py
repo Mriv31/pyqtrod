@@ -123,6 +123,7 @@ class NITab(QtWidgets.QMainWindow):
             nb = QtWidgets.QDoubleSpinBox()
             layout2.addWidget(nb)
             nb.setValue(self.NIf.b[i])
+            nb.setMinimum(-3)
             nb.valueChanged.connect(partial(self.NIv.set_b,channel = i))
             self.bbut.append(nb)
 
@@ -217,6 +218,29 @@ class NITab(QtWidgets.QMainWindow):
           winpg.show()
           winpg.setAttribute(QtCore.Qt.WA_DeleteOnClose)
           return winpg,w
+
+    def plot3D2D(self,title="",xtitle="",ytitle=""):
+        winpg = QtWidgets.QMdiSubWindow()
+        winpg.setWindowTitle(title)
+        widget = QtWidgets.QWidget()
+        winpg.setWidget(widget)
+        self.mdiArea.addSubWindow(winpg)
+        w = gl.GLViewWidget()
+        w.setWindowTitle(title)
+        w.setCameraPosition(distance=40)
+        layoutgb = QtWidgets.QGridLayout()
+        widget.setLayout(layoutgb)
+        ploth= pg.PlotWidget(title=title)
+        ploth.enableAutoRange(True, True)
+        layoutgb.addWidget(w, 0, 0)
+        layoutgb.addWidget(ploth, 0, 1)
+        winpg.show()
+        winpg.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
+        ploth.sizeHint = lambda: pg.QtCore.QSize(100, 100)
+        w.sizeHint = lambda: pg.QtCore.QSize(100, 100)
+        w.setSizePolicy(ploth.sizePolicy())
+        return winpg,w,ploth
 
 class ModuleDialog(QtWidgets.QDialog):
      def __init__(self, name, stringlist=None, checked=False, icon=None, parent=None):

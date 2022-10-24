@@ -5,6 +5,7 @@ import numpy as np
 from scipy import signal
 from PyQtWorker import PyQtWorker
 import pyqtgraph.opengl as gl
+import pyqtgraph as pg
 from pyqtgraph import mkColor
 from functools import partial
 from corr_matrix import *
@@ -13,10 +14,10 @@ from Fourkas import *
 
 
 
-class FKtraj(QtWidgets.QWidget):
+class Traj_corr(QtWidgets.QWidget):
     def __init__(self,NITab):
         super(QtWidgets.QWidget, self).__init__()
-        uic.loadUi('Modules/FKtraj.ui', self)
+        uic.loadUi('Modules/Traj_corr.ui', self)
 
 
         self.NITab = NITab
@@ -36,6 +37,30 @@ class FKtraj(QtWidgets.QWidget):
         self.set_start_stop_visible()
         self.stopbox.setMaximum(self.NITab.NIf.datasize/self.NITab.NIf.freq)
         self.startbox.setMaximum(self.NITab.NIf.datasize/self.NITab.NIf.freq)
+
+
+        self.acorrslider.setMaximum(0.5)
+        self.acorrslider.setMinimum(-0.5)
+        self.acorrslider.valueChanged.connect(self.update_a)
+        self.bcorrslider.setMaximum(0.5)
+        self.bcorrslider.setMinimum(-0.5)
+        self.bcorrslider.valueChanged.connect(self.update_b)
+        self.ccorrslider.setMaximum(0.5)
+        self.ccorrslider.setMinimum(-0.5)
+        self.ccorrslider.valueChanged.connect(self.update_c)
+
+        self.dcorrslider.setMaximum(0.5)
+        self.dcorrslider.setMinimum(-0.5)
+        self.dcorrslider.valueChanged.connect(self.update_d)
+
+
+
+
+
+        self.acorr = 0
+        self.bcorr = 0
+        self.ccorr = 0
+        self.dcorr = 0
 
 
         self.timer = QtCore.QTimer()
@@ -64,9 +89,20 @@ class FKtraj(QtWidgets.QWidget):
 
 
 
-        NITab.add_tool_widget(self,"FKtraj")
+        NITab.add_tool_widget(self,"Traj_corr")
 
-
+    def update_a(self,x):
+        self.acorr = x
+        self.update_freq()
+    def update_b(self,x):
+        self.bcorr = x
+        self.update_freq()
+    def update_c(self,x):
+        self.ccorr = x
+        self.update_freq()
+    def update_d(self,x):
+        self.dcorr = x
+        self.update_freq()
 
     def set_conv_window(self,x):
         self.convolutionwindow = x
@@ -117,6 +153,14 @@ class FKtraj(QtWidgets.QWidget):
 
         # Execute
         self.NITab.threadpool.start(worker)
+    def update_freq(self):
+        worker = PyQtWorker(self.main_comp) # Any other args, kwargs are passed to the run function
+        worker.signals.result.connect(self.update_cloud)
+        #worker.signals.finished.connect(self.thread_complete)
+        worker.signals.progress.connect(self.progress_fn)
+
+        # Execute
+        self.NITab.threadpool.start(worker)
     def main_comp(self, progress_callback):
         self.stopbutton.setEnabled(False)
         self.timer.stop()
@@ -124,29 +168,35 @@ class FKtraj(QtWidgets.QWidget):
         channels = []
         print(self.start,self.stop)
 
-
         for i in range(4):
-            channels.append(self.NITab.NIf.channels[i][self.start:self.stop]*self.NITab.NIf.a[i]+self.NITab.NIf.b[i])
+            channels.append(self.NITab.NIf.channels[i][self.start:self.stop])
         pol_ind = self.NITab.NIf.get_pol_ind(["0","90","45","135"])
         c0,c90,c45,c135 = [channels[pol_ind[i]] for i in range(len(pol_ind))]
-        print(pol_ind)
-        progress_callback.emit(30)
 
+
+        #res = find_best_matrix(c0,c90,c45,c135)
+        ac = np.asarray(np.vstack((c0,c90,c45,c135)))
+        bc = np.dot(Icor_matrix(a=self.acorr,b=self.bcorr,c=self.ccorr,d=self.dcorr),ac)
+        c0 = bc[0,:]
+        c90 = bc[1,:]
+        c45 = bc[2,:]
+        c135 = bc[3,:]
 
         phi,theta1,theta2,Itots2thet,Itots2thet2,Itot,I135 = Fourkas_compItot(c0,c90,c45,c135,NA=1.3,nw=1.33)
+
+
         self.theta1 = theta1
-        #theta2 = np.arcsin(np.sqrt((c45-c135)/(2*Itots2thet*C*ss)))
 
         phi = np.unwrap(phi,period=np.pi)
         progress_callback.emit(70)
 
 
+
         self.v1 = np.column_stack((np.sin(theta1)*np.cos(phi),np.sin(theta1)*np.sin(phi),np.cos(theta1)))
-        #v2 = np.array([np.sin(theta0)*np.cos(phi0),np.sin(theta0)*np.sin(phi0),np.cos(theta0)])
-        #fac = v1.transpose().dot(v2)
-        #Itot = Itots2thet / np.sin(theta1)**2
         self.v1[np.isnan(self.v1)] = 0
         self.phi = phi
+        self.phiu = np.unwrap(self.phi,period=np.pi)
+        self.phir=self.phiu%(2*np.pi)
         self.samplesize = len(self.phi)
         self.index = 0
         self.convolvebutton.setEnabled(True)
@@ -161,6 +211,11 @@ class FKtraj(QtWidgets.QWidget):
         self.rodline.setData(pos=np.vstack(([0,0,0],np.average(self.v1[self.index:self.index+self.npoints],axis=0))))
         self.scatter.setData(pos=self.v1[self.index:self.index+self.npoints])
         self.elapsedtime.setText("{:.3f}".format(self.index/self.NITab.NIf.freq*1000)+ "ms")
+
+    def update_cloud(self):
+        self.plt.setData(pos=self.v1)
+        y,x = np.histogram(self.phir,100)
+        self.curve.setData(x,y)
 
     def stop_animation(self):
         self.stopbutton.setEnabled(False)
@@ -188,7 +243,7 @@ class FKtraj(QtWidgets.QWidget):
         if (len(self.phi) > 2e6):
             return
 
-        self.winpg,self.w = self.NITab.plot3D(title="3D plot - FKtraj")
+        self.winpg,self.w,self.ploth = self.NITab.plot3D2D(title="3D plot - FKtraj")
 
         self.winpg.destroyed.connect(partial(self.wdestroyed,self.winpg))
 
@@ -200,17 +255,6 @@ class FKtraj(QtWidgets.QWidget):
         color.setAlphaF(1)
         plt = gl.GLScatterPlotItem(pos=np.asarray([0,0,0]),color=color,size=0.1,pxMode=False)
         self.w.addItem(plt)
-
-        color=mkColor('b')
-        plt = gl.GLLinePlotItem(pos=np.vstack(([0,0,0],[0,0,2])),color=color,) #vertical line
-        self.w.addItem(plt)
-
-
-        color=mkColor('g')
-        plt = gl.GLLinePlotItem(pos=np.vstack(([0,0,0],[0,2,0])),color=color,) #vertical line
-
-
-        self.w.addItem(plt)
         self.rodline = gl.GLLinePlotItem(pos=np.vstack(([0,0,0],self.v1[0])))
         self.w.addItem(self.rodline)
         color=mkColor('w')
@@ -220,6 +264,9 @@ class FKtraj(QtWidgets.QWidget):
         #y = np.convolve(np.diff(res), np.ones(1000)/1000, mode='valid')
         #self.NITab.plot(np.arange(len(y))*self.NITab.NIf.freq,y)
         self.playbutton.setEnabled(True)
+        y,x = np.histogram(self.phir,100)
+        self.curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
+        self.ploth.addItem(self.curve)
 
     def display_convolution_speed(self):
          self.NITab.plot(np.linspace((self.start-self.NITab.NIf.time_off)/self.NITab.NIf.freq,(self.stop-self.NITab.NIf.time_off)/self.NITab.NIf.freq,len(self.speed_phi)),self.speed_phi*self.NITab.NIf.freq/2/np.pi,title="FIR derivative of phi",xtitle="Time (s)", ytitle="Speed ")

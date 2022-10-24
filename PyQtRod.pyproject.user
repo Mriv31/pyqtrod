@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 7.0.1, 2022-06-18T17:16:21. -->
+<!-- Written by QtCreator 7.0.1, 2022-10-21T18:15:14. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -139,6 +139,78 @@
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers.py</value>
     <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{9a00d4f2-d26a-4bb1-8244-fbd1e6449510}</value>
     <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers.py</value>
+    <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/martin/Documents/Post-Doc/datoviz/PyQtRod</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.10">
+    <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.QmlProfiler.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.Valgrind.Settings.UseGlobalSettings">true</value>
+    <valuelist type="QVariantList" key="CustomOutputParsers"/>
+    <value type="int" key="PE.EnvironmentAspect.Base">2</value>
+    <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Modules/Traj_corr.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/martin/Documents/Post-Doc/datoviz/PyQtRod/Modules/Traj_corr.py</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Modules/Traj_corr.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{9a00d4f2-d26a-4bb1-8244-fbd1e6449510}</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Modules/Traj_corr.py</value>
+    <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Modules</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.11">
+    <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.QmlProfiler.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.Valgrind.Settings.UseGlobalSettings">true</value>
+    <valuelist type="QVariantList" key="CustomOutputParsers"/>
+    <value type="int" key="PE.EnvironmentAspect.Base">2</value>
+    <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Fourkas.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/martin/Documents/Post-Doc/datoviz/PyQtRod/Fourkas.py</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Fourkas.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{9a00d4f2-d26a-4bb1-8244-fbd1e6449510}</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Fourkas.py</value>
+    <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/martin/Documents/Post-Doc/datoviz/PyQtRod</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.12">
+    <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.QmlProfiler.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.Valgrind.Settings.UseGlobalSettings">true</value>
+    <valuelist type="QVariantList" key="CustomOutputParsers"/>
+    <value type="int" key="PE.EnvironmentAspect.Base">2</value>
+    <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/corr_matrix.py</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/martin/Documents/Post-Doc/datoviz/PyQtRod/corr_matrix.py</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/corr_matrix.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{9a00d4f2-d26a-4bb1-8244-fbd1e6449510}</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/corr_matrix.py</value>
+    <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/martin/Documents/Post-Doc/datoviz/PyQtRod</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.13">
+    <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.QmlProfiler.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.Valgrind.Settings.UseGlobalSettings">true</value>
+    <valuelist type="QVariantList" key="CustomOutputParsers"/>
+    <value type="int" key="PE.EnvironmentAspect.Base">2</value>
+    <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/form2.cpp</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/martin/Documents/Post-Doc/datoviz/PyQtRod/form2.cpp</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/form2.cpp</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{9a00d4f2-d26a-4bb1-8244-fbd1e6449510}</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/form2.cpp</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
@@ -292,7 +364,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/martin/Documents/Post-Doc/datoviz/PyQtRod</value>
    </valuemap>
-   <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">10</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">14</value>
   </valuemap>
  </data>
  <data>

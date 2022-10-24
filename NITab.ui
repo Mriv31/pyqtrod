@@ -16,39 +16,6 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_11">
     <item>
-     <widget class="QMdiArea" name="mdiArea">
-      <property name="viewMode">
-       <enum>QMdiArea::SubWindowView</enum>
-      </property>
-      <property name="documentMode">
-       <bool>true</bool>
-      </property>
-      <property name="tabsClosable">
-       <bool>false</bool>
-      </property>
-      <property name="tabsMovable">
-       <bool>false</bool>
-      </property>
-      <widget class="QWidget" name="Visualizator">
-       <property name="contextMenuPolicy">
-        <enum>Qt::NoContextMenu</enum>
-       </property>
-       <property name="windowTitle">
-        <string>Raw data visualizator</string>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QChartView" name="rawview">
-          <property name="contextMenuPolicy">
-           <enum>Qt::DefaultContextMenu</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
-    <item>
      <widget class="QWidget" name="widget_10" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
@@ -75,6 +42,39 @@
          <property name="tickPosition">
           <enum>QSlider::TicksBelow</enum>
          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QMdiArea" name="mdiArea">
+         <property name="viewMode">
+          <enum>QMdiArea::SubWindowView</enum>
+         </property>
+         <property name="documentMode">
+          <bool>true</bool>
+         </property>
+         <property name="tabsClosable">
+          <bool>false</bool>
+         </property>
+         <property name="tabsMovable">
+          <bool>false</bool>
+         </property>
+         <widget class="QWidget" name="Visualizator">
+          <property name="contextMenuPolicy">
+           <enum>Qt::NoContextMenu</enum>
+          </property>
+          <property name="windowTitle">
+           <string>Raw data visualizator</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QChartView" name="rawview">
+             <property name="contextMenuPolicy">
+              <enum>Qt::DefaultContextMenu</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>

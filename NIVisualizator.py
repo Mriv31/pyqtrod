@@ -61,8 +61,17 @@ class NIVisualizator():
          inda = inds[0]
          indb = inds[1]
          pol_ind = self.NIf.get_pol_ind(["0","90","45","135"])
-         c0,c90,c45,c135 = [self.NIf.ys[pol_ind[i]] for i in range(len(pol_ind))]
+         c0,c90,c45,c135 = [self.NIf.data[pol_ind[i],:] for i in range(len(pol_ind))]
          return c0[inda:indb],c90[inda:indb],c45[inda:indb],c135[inda:indb]
+
+    def get_visible_pol_channels_raw(self):
+          xa,ya,xb,yb = self.get_lim()
+          inds = self.NIf.time_to_index_in_file([xa,xb])
+          inda = inds[0]
+          indb = inds[1]
+          pol_ind = self.NIf.get_pol_ind(["0","90","45","135"])
+          c0,c90,c45,c135 = [self.NIf.channels[pol_ind[i]][inda:indb] for i in range(len(pol_ind))]
+          return c0,c90,c45,c135
 
 
     def set_visible_channel(self,status,channel):
@@ -99,24 +108,24 @@ class NIVisualizator():
             series = QLineSeries(chart)
             series.setUseOpenGL(1)
             self.series.append(series)
-            polygon = array2d_to_qpolygonf(self.NIf.data[i][:,0], self.NIf.data[i][:,1])
+            polygon = array2d_to_qpolygonf(self.NIf.xs, self.NIf.data[i,:])
             series << polygon
             chart.addSeries(series)
             series.attachAxis(self.axisX)
             series.attachAxis(self.axisY)
 
 
-            newminx = np.min(self.NIf.data[i][:,0])
+            newminx = np.min(self.NIf.xs)
             if i == 0 or newminx < self.minx:
                 self.minx = newminx
-            newmaxx = np.max(self.NIf.data[i][:,0])
+            newmaxx = np.max(self.NIf.xs)
             if i == 0 or newmaxx > self.maxx:
                  self.maxx = newmaxx
 
-            newminy = np.min(self.NIf.data[i][:,1])
+            newminy = np.min(self.NIf.data[i,:])
             if i == 0 or newminy < self.miny:
                         self.miny = newminy
-            newmaxy = np.max(self.NIf.data[i][:,1])
+            newmaxy = np.max(self.NIf.data[i,:])
             if i == 0 or newmaxy > self.maxy:
                         self.maxy = newmaxy
 
@@ -135,8 +144,8 @@ class NIVisualizator():
 
 
 
-            xar = self.NIf.data[i][:,0]
-            yar = self.NIf.data[i][:,1]
+            xar = self.NIf.xs
+            yar = self.NIf.data[i,:]
 
 
             polygon = array2d_to_qpolygonf(xar,yar)
