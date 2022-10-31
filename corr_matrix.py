@@ -121,6 +121,25 @@ def best_coeff_func(params,ac):
     c135 = ac[3,:]
     return np.sum((c0 + a90*c90 - c45*a45-c135*a135)**2)
 
+def true_best_coeff_func_mat(params,ac,mat):
+    a90,a45,a135 = params
+    ap = np.copy(ac)
+    ap[1,:]*=a90
+    ap[2,:]*=a45
+    ap[3,:]*=a135
+    bc = np.dot(mat,ap)
+    c0 = bc[0,:]
+    c90 = bc[1,:]
+    c45 = bc[2,:]
+    c135 = bc[3,:]
+    return np.sum((c0 + c90 - c45-c135)**2)
+
+def find_best_coeff_using_mat(c0,c90,c45,c135,mat):
+    ac = np.asarray(np.vstack((c0,c90,c45,c135)))
+    result = minimize(partial(true_best_coeff_func_mat,ac=ac,mat=mat), [1,1,1])
+
+    return result
+
 def true_best_coeff_func(params,ac):
     a90,a45,a135 = params
     ap = np.copy(ac)

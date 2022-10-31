@@ -19,32 +19,6 @@
      <widget class="QWidget" name="widget_10" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Seconds</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabeledDoubleRangeSlider" name="DataSlider">
-         <property name="tracking">
-          <bool>true</bool>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="invertedAppearance">
-          <bool>false</bool>
-         </property>
-         <property name="invertedControls">
-          <bool>false</bool>
-         </property>
-         <property name="tickPosition">
-          <enum>QSlider::TicksBelow</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QMdiArea" name="mdiArea">
          <property name="viewMode">
           <enum>QMdiArea::SubWindowView</enum>
@@ -78,6 +52,32 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_10">
+      <property name="text">
+       <string>Seconds</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabeledDoubleRangeSlider" name="DataSlider">
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
+      </property>
+      <property name="invertedControls">
+       <bool>false</bool>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksBelow</enum>
+      </property>
      </widget>
     </item>
    </layout>
@@ -610,7 +610,15 @@
     </property>
     <addaction name="actionModule"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionEdit_Matrix"/>
+    <addaction name="actionChoose_Matrix"/>
+   </widget>
    <addaction name="menuLoad"/>
+   <addaction name="menuEdit"/>
   </widget>
   <widget class="QDockWidget" name="dockanalysis">
    <property name="features">
@@ -626,6 +634,16 @@
   <action name="actionModule">
    <property name="text">
     <string>Module</string>
+   </property>
+  </action>
+  <action name="actionEdit_Matrix">
+   <property name="text">
+    <string>Edit Matrix</string>
+   </property>
+  </action>
+  <action name="actionChoose_Matrix">
+   <property name="text">
+    <string>Choose Matrix</string>
    </property>
   </action>
  </widget>
@@ -662,8 +680,42 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionEdit_Matrix</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>edit_matrix_menu()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>664</x>
+     <y>369</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionChoose_Matrix</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>choose_matrix_menu()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>664</x>
+     <y>369</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>load_module_menu()</slot>
+  <slot>edit_matrix_menu()</slot>
+  <slot>choose_matrix_menu()</slot>
  </slots>
 </ui>

@@ -64,13 +64,15 @@ class NIVisualizator():
          c0,c90,c45,c135 = [self.NIf.data[pol_ind[i],:] for i in range(len(pol_ind))]
          return c0[inda:indb],c90[inda:indb],c45[inda:indb],c135[inda:indb]
 
+
+
     def get_visible_pol_channels_raw(self):
           xa,ya,xb,yb = self.get_lim()
           inds = self.NIf.time_to_index_in_file([xa,xb])
           inda = inds[0]
           indb = inds[1]
           pol_ind = self.NIf.get_pol_ind(["0","90","45","135"])
-          c0,c90,c45,c135 = [self.NIf.channels[pol_ind[i]][inda:indb] for i in range(len(pol_ind))]
+          c0,c90,c45,c135 = [self.NIf.channels[pol_ind[i]][inda:indb:self.NIf.dec] for i in range(len(pol_ind))]
           return c0,c90,c45,c135
 
 

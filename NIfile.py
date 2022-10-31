@@ -9,22 +9,30 @@ from corr_matrix import *
 
 class NIfile:
     n_signals = 4
-    def __init__(self,path,max_size=20000,dec=100):
+    def __init__(self,path,max_size=20000,dec=100,indstart=0):
         self.path = path
         self.max_size = max_size
         self.indstart = 0
-        self.tdms_file = TdmsFile.open(self.path)
+        try:
+            self.tdms_file = TdmsFile.open(self.path)
+        except:
+            raise ValueError("Problem opening file "+path)
         self.group = self.tdms_file.groups()[0]
 
-        self.channels = self.group.channels()
-        self.channelnames = [i.name for i in self.channels]
-        self.orientations = ["90","45","135","0"]
-        self.groupnb = len(self.tdms_file.groups())
+        try:
 
-        self.time_inc = self.channels[0].properties['wf_increment']
-        self.time_off = self.channels[0].properties['wf_start_offset']
-        self.starttime = self.channels[0].properties['wf_start_time']
-        self.freq = 1/self.time_inc
+            self.channels = self.group.channels()
+            self.channelnames = [i.name for i in self.channels]
+            self.orientations = ["90","45","135","0"]
+            self.groupnb = len(self.tdms_file.groups())
+
+            self.time_inc = self.channels[0].properties['wf_increment']
+            self.time_off = self.channels[0].properties['wf_start_offset']
+            self.starttime = self.channels[0].properties['wf_start_time']
+            self.freq = 1/self.time_inc
+        except:
+            TdmsFile.close(self.path)
+            raise ValueError("Problem loading file "+path)
         self.center = -1
         self.dec_average = 1
         self.a=[1,1,1,1]
@@ -59,6 +67,7 @@ class NIfile:
         self.data = np.zeros([self.n_signals,self.ld]) #references to the whole data that correspond to the channels
         self.xs = np.zeros(self.ld)
         self.update_data_from_file(time)
+
     def get_pol_ind(self,listpol):
         indlist = []
         for i in range(len(listpol)):
@@ -115,6 +124,14 @@ class NIfile:
         self.maxxmem = np.max(np.asarray(self.xs))
         return 0
 
+    def ret_cor_channel(self,start,stop,ordl=["0","90","45","135"]):
+        data = np.zeros([4,stop-start])
+        for i in range(self.n_signals):
+                data[i,:] = self.b[i]+self.a[i]*self.channels[i][start:stop]
+        data = np.dot(self.matcor,data)
+        index = self.get_pol_ind(ordl)
+        return data[index[0],:],data[index[1],:],data[index[2],:],data[index[3],:]
+
     def update_data_from_file(self,time,norep=0):
 
 
@@ -148,6 +165,11 @@ class NIfile:
         self.minxmem = np.min(np.asarray(self.xs))
         self.maxxmem = np.max(np.asarray(self.xs))
         return 0
+
+    def full_ordered_pol(self):
+        pol_ind = self.get_pol_ind(["0","90","45","135"])
+        c0,c90,c45,c135 = [self.data[pol_ind[i],:] for i in range(len(pol_ind))]
+        return c0,c90,c45,c135
 
 
 

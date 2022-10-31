@@ -1,3 +1,3 @@
 {
-    "files": ["Modules/FreqFFT.ui","PyQtRod.py","NITab.ui","Fourkas.py","Modules/FKtraj.py","Helpers.py","PyQtWorker.py","NIVisualizator.py","form.ui","Modules/ComputeCoeffs.ui","NITab.py","Modules/FreqFFT.py","Series.py","Modules/Traj_corr.py","corr_matrix.py","Modules/FKtraj.ui","Modules/ComputeCoeffs.py","NIfile.py","Modules/Traj_corr.ui","form2.h","form2.cpp","form2.ui"]
+    "files": ["PyQtGraph.py","form2.cpp","ECF.py","corr_matrix.py","Modules/Traj_corr.py","Modules/FKtraj.py","Modules/Traj_corr.ui","NIVisualizator.py","Fourkas.py","Modules/FreqFFT.ui","PyQtRod.py","form2.h","form.ui","Modules/ComputeCoeffs.ui","NIfile.py","MatrixDialog.py","NIFolderTab.py","NITab.ui","NITab.py","ModuleDialog.py","Modules/ComputeCoeffs.py","Helpers.py","form2.ui","Modules/FKtraj.ui","Series.py","PyQtWorker.py","Modules/FreqFFT.py","PyQtFunc.py"]
 }

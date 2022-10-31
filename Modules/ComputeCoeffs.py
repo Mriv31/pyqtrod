@@ -26,7 +26,7 @@ class ComputeCoeffs(QtWidgets.QWidget):
 
         self.c0,self.c90,self.c45,self.c135 = self.NITab.NIv.get_visible_pol_channels_raw()
 
-        par =  find_best_coeff_using_matrix(self.c0,self.c90,self.c45,self.c135) #must be used on raw data since apply matrix
+        par =  find_best_coeff_using_mat(self.c0,self.c90,self.c45,self.c135,self.NITab.NIf.matcor) #must be used on raw data since apply matrix
 
         l90,l45,l135 = par.x
 

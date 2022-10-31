@@ -50,6 +50,7 @@
      <string>File</string>
     </property>
     <addaction name="actionLoad_TDMS_file"/>
+    <addaction name="actionSummarize_Folder"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -61,6 +62,11 @@
   <action name="actionLoad_PDMS_file">
    <property name="text">
     <string>Load PDMS file ...</string>
+   </property>
+  </action>
+  <action name="actionSummarize_Folder">
+   <property name="text">
+    <string>Summarize Folder </string>
    </property>
   </action>
  </widget>
@@ -82,8 +88,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSummarize_Folder</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>SumFolder()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>329</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadTDMS()</slot>
+  <slot>SumFolder()</slot>
  </slots>
 </ui>

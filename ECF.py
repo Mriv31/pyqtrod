@@ -22,7 +22,7 @@ def to_iterator(obj_ids):
 
 def ECF(phir,nstepmax=1000,nwindow=100,start=0,nshift=50,modemin=1,modemax=50):
     ray.shutdown()
-    ray.init(object_store_memory=7*10**9)
+    ray.init()
     ray.put(phir)
     N = len(phir)
     modelist=range(modemin,modemax)

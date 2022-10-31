@@ -82,10 +82,8 @@ class FreqFFT(QtWidgets.QWidget):
     def main_comp(self, progress_callback):
         channels = []
 
-        for i in range(4):
-            channels.append(self.NITab.NIf.channels[i][self.start:self.stop]*self.NITab.NIf.a[i]+self.NITab.NIf.b[i])
-        pol_ind = self.NITab.NIf.get_pol_ind(["0","90","45","135"])
-        c0,c90,c45,c135 = [channels[pol_ind[i]] for i in range(len(pol_ind))]
+
+        c0,c90,c45,c135 = self.NITab.NIf.ret_cor_channel(self.start,self.stop)
         I0 = (c0 - c90) / (c0 + c90)
         I1 = (c45 - c135) / (c45 + c135)
         x = I0 + 1.j * I1

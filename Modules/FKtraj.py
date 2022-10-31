@@ -125,10 +125,8 @@ class FKtraj(QtWidgets.QWidget):
         print(self.start,self.stop)
 
 
-        for i in range(4):
-            channels.append(self.NITab.NIf.channels[i][self.start:self.stop]*self.NITab.NIf.a[i]+self.NITab.NIf.b[i])
-        pol_ind = self.NITab.NIf.get_pol_ind(["0","90","45","135"])
-        c0,c90,c45,c135 = [channels[pol_ind[i]] for i in range(len(pol_ind))]
+        c0,c90,c45,c135 = ret_cor_channel(self.start,self.stop)
+
         print(pol_ind)
         progress_callback.emit(30)
 
@@ -223,8 +221,3 @@ class FKtraj(QtWidgets.QWidget):
 
     def display_convolution_speed(self):
          self.NITab.plot(np.linspace((self.start-self.NITab.NIf.time_off)/self.NITab.NIf.freq,(self.stop-self.NITab.NIf.time_off)/self.NITab.NIf.freq,len(self.speed_phi)),self.speed_phi*self.NITab.NIf.freq/2/np.pi,title="FIR derivative of phi",xtitle="Time (s)", ytitle="Speed ")
-
-
-
-
-
