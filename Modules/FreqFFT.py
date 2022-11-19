@@ -41,6 +41,9 @@ class FreqFFT(QtWidgets.QWidget):
         self.startbox.valueChanged.connect(self.set_start)
         self.stopbox.valueChanged.connect(self.set_stop)
 
+        self.boxes = [self.c0box,self.c90box,self.c45box,self.c135box,self.anisbox,self.itotbox]
+        self.boxnames = ["C0","C90","C45","C135","ANIS","ITOT"]
+
 
         NITab.add_tool_widget(self,"FreqFFT")
 
@@ -81,28 +84,54 @@ class FreqFFT(QtWidgets.QWidget):
         self.NITab.threadpool.start(worker)
     def main_comp(self, progress_callback):
         channels = []
+        progress_callback.emit(0)
 
 
-        c0,c90,c45,c135 = self.NITab.NIf.ret_cor_channel(self.start,self.stop)
-        I0 = (c0 - c90) / (c0 + c90)
-        I1 = (c45 - c135) / (c45 + c135)
-        x = I0 + 1.j * I1
 
-        xar = np.arange(0,len(I0),1)/self.NITab.NIf.freq
+        C0,C90,C45,C135 = self.NITab.NIf.ret_cor_channel(self.start,self.stop)
+        I0 = (C0 - C90) / (C0 + C90)
+        I1 = (C45 - C135) / (C45 + C135)
+        if (self.anisbox.isChecked()):
+            ANIS = I0 + 1.j * I1
+        if (self.itotbox.isChecked()):
+            ITOT = C90+C0+C45+C135
+        res= []
 
-        n_seg = int(len(xar)/self.overlap) - 1
-        max_freq = []
-        xarr= []
-        for i in range(n_seg):
-            f0, Pxx_den0 = signal.welch(x[i*self.overlap:i*self.overlap+self.windowsize], self.NITab.NIf.freq,nperseg=self.nperseg,nfft=self.nfft)
-            max_freq.append(f0[np.argmax(Pxx_den0)])
-            xarr.append((self.start + self.overlap*i)/self.NITab.NIf.freq)
-            progress_callback.emit(int(i/n_seg*100))
-        progress_callback.emit(100)
-        return xarr,max_freq
+        nchecked = 0
+
+        for b in self.boxes:
+            if b.isChecked():
+                nchecked+=1
+
+
+        for bi in range(len(self.boxes)):
+            if self.boxes[bi].isChecked():
+                x = locals()[self.boxnames[bi]]
+            else:
+                continue
+
+            n_seg = int(len(x)/self.overlap) - 1
+            max_freq = []
+            xarr= []
+            for i in range(n_seg):
+                f0, Pxx_den0 = signal.welch(x[i*self.overlap:i*self.overlap+self.windowsize], self.NITab.NIf.freq,nperseg=self.nperseg,nfft=self.nfft)
+                max_freq.append(f0[np.argmax(Pxx_den0)])
+                xarr.append((self.start + self.overlap*i)/self.NITab.NIf.freq)
+                progress_callback.emit(int(i/n_seg*100*(bi+1)/nchecked))
+            progress_callback.emit(int(100*(bi+1)/nchecked))
+            res.append((np.array(xarr),np.array(max_freq),self.boxnames[bi]))
+        return res
 
     def progress_fn(self,number):
         self.progressBar.setValue(number)
     def display_result(self,res):
-        xarr,max_freq = res
-        self.NITab.plot(xarr,max_freq,title="Freq of X + i Y",xtitle="Time(s)",ytitle="Max Freq (Hz)")
+        first = 1
+        for r in res:
+            xarr,max_freq,name = r
+            if (first == 1):
+                ph = self.NITab.plot(xarr,max_freq,title="Freq of X + i Y",xtitle="Time(s)",ytitle="Max Freq (Hz)",name=name)
+                first = 0
+            else:
+                ph.add_ds(xarr,max_freq,name=name)
+
+

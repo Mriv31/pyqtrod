@@ -2,11 +2,12 @@
 from PyQt6 import QtCore
 from PyQt6.QtCore import Qt
 from PyQt6 import QtWidgets, uic, QtGui
-from PyQtGraph import PyQtGraph,PyQtGraphGrid
+from PyQtRGraph import PyQtGraphGrid
 import os, glob
 import numpy as np
 from PyQtFunc import *
 from NIfile import NIfile
+from PIL import Image
 
 class NIFolderTab(QtWidgets.QMainWindow):
     def __init__(self,NIfolder):
@@ -27,8 +28,7 @@ class NIFolderTab(QtWidgets.QMainWindow):
         self.scrolled.setWidgetResizable(True)
         self.scrolled.setWidget(widget)
         self.maxcol = 1
-        os.chdir(self.fold)
-        self.files = glob.glob("*.tdms")
+        self.files = glob.glob(self.fold+"/*.tdms")
         self.displayFiles()
         pass
 
@@ -54,17 +54,32 @@ class NIFolderTab(QtWidgets.QMainWindow):
 
     def displayNIfileSum(self,file,w):
         try:
-            Nif = NIfile(file,dec=1)
+            Nif = NIfile(file,dec=1,max_size=100000)
         except:
             print("Error loading file "+file)
             return 1
         c0,c90,c45,c135=Nif.full_ordered_pol()
         x,y = anisotropies(c0,c45,c90,c135)
-        w.addPlot(x,y,xtitle="Anisotropy 0/90",ytitle="Anisotropy 45/135")
-        x,y = PSF(c0)
-        w.addPlot(x,y,logx=1,logy=1,xtitle="Freq (Hz)",ytitle="PSD (V²/Hz)")
-        w.addPlot(c0,c90,xtitle="c0",ytitle="c90")
-        w.addPlot(c45,c135,xtitle="c45",ytitle="c135")
+        w.addScatterPlot(x[:10000],y[:10000],xtitle="Anisotropy 0/90",ytitle="Anisotropy 45/135")
+        x,y = PSD(c0+c45+c90+c135,nperseg=10000)
+        w.addPlot(x,y,legend=1,dsdes="Sum",logx=1,logy=1,xtitle="Freq (Hz)",ytitle="PSD (V²/Hz)")
+        #w.addPlot(c0,c90,xtitle="c0",ytitle="c90")
+        #w.addPlot(c45,c135,xtitle="c45",ytitle="c135")
+
+
+        im = np.asarray(Image.open(file[:-4]+"tiff"))
+
+
+        w.addImage(im)
+
+        I0 = (c0 - c90) / (c0 + c90)
+        I1 = (c45 - c135) / (c45 + c135)
+        x = I0 + 1.j * I1
+        x,y = PSD(x,nperseg=10000)
+        ind = np.where(np.logical_and(x<1500,x>-1500))
+        w.addPlot(x[ind],y[ind],logx=0,logy=1,xtitle="Freq (Hz)",ytitle="PSD (V²/Hz)")
+
+
         return 0
 
 

@@ -2,6 +2,10 @@
 import os
 from pathlib import Path
 import sys
+sys.path.insert(0, './Modules')
+sys.path.insert(0, './Helpers')
+
+
 from NIfile import NIfile
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import QThreadPool, QCoreApplication, Qt, QPointF, QSize
@@ -34,6 +38,8 @@ class MainWindow(QtWidgets.QMainWindow):
         NIf = NIfile(path[0]);
         newtab = NITab(NIf,self.threadpool);
         self.FileTab.addTab(newtab,path[0])
+        self.FileTab.setCurrentWidget(newtab)
+
         return
 
     def SumFolder(self):
@@ -49,11 +55,9 @@ class MainWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
 
     app = QtWidgets.QApplication(['PyQtRod'])
-    #app.setApplicationName("PyQtRod")
-    #QtWidgets.qApp.setApplicationName("PyQtRod")
 
     window = MainWindow()
-    sys.path.insert(0, './Modules')
+
 
 
     window.show()

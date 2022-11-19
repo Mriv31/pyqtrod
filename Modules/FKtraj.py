@@ -125,9 +125,8 @@ class FKtraj(QtWidgets.QWidget):
         print(self.start,self.stop)
 
 
-        c0,c90,c45,c135 = ret_cor_channel(self.start,self.stop)
+        c0,c90,c45,c135 = self.NITab.NIf.ret_cor_channel(self.start,self.stop)
 
-        print(pol_ind)
         progress_callback.emit(30)
 
 
@@ -159,6 +158,7 @@ class FKtraj(QtWidgets.QWidget):
         self.rodline.setData(pos=np.vstack(([0,0,0],np.average(self.v1[self.index:self.index+self.npoints],axis=0))))
         self.scatter.setData(pos=self.v1[self.index:self.index+self.npoints])
         self.elapsedtime.setText("{:.3f}".format(self.index/self.NITab.NIf.freq*1000)+ "ms")
+        self.text3D.setData(text="{:.3f}".format(self.index/self.NITab.NIf.freq*1000)+ "ms")
 
     def stop_animation(self):
         self.stopbutton.setEnabled(False)
@@ -206,9 +206,11 @@ class FKtraj(QtWidgets.QWidget):
 
         color=mkColor('g')
         plt = gl.GLLinePlotItem(pos=np.vstack(([0,0,0],[0,2,0])),color=color,) #vertical line
-
-
         self.w.addItem(plt)
+
+        self.text3D = gl.GLTextItem(pos=[1,1,1],color=color)
+        self.w.addItem(self.text3D)
+
         self.rodline = gl.GLLinePlotItem(pos=np.vstack(([0,0,0],self.v1[0])))
         self.w.addItem(self.rodline)
         color=mkColor('w')

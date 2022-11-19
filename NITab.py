@@ -14,6 +14,9 @@ import os
 from ModuleDialog import ModuleDialog
 from MatrixDialog import MatrixDialog,MatrixChoose
 
+from PyQtRGraph import PyQtGraphGrid
+
+
 
 
 class NITab(QtWidgets.QMainWindow):
@@ -37,6 +40,18 @@ class NITab(QtWidgets.QMainWindow):
         self.toolmodules = []
         self.imported_modules = []
         self.choose_matrix_menu()
+        self.load_all_modules()
+
+    def load_all_modules(self):
+        fl = os.listdir("./Modules/")
+        fl2 = []
+        for f in fl:
+            if f.endswith(".py"):
+                if not f.endswith("beta.py"):
+                    fl2.append(f)
+        for t in fl2:
+            self.load_module(t[:-3])
+
 
     def load_module_menu(self):
         fl = os.listdir("./Modules/")
@@ -207,17 +222,15 @@ class NITab(QtWidgets.QMainWindow):
         self.NIf.orientations[channel] = string
 
 
-    def plot(self,x,y,title="",xtitle="",ytitle=""):
+    def plot(self,x,y,title="",xtitle="",ytitle="",**kwargs):
          winpg = QtWidgets.QMdiSubWindow()
          winpg.setWindowTitle(title)
          self.mdiArea.addSubWindow(winpg)
-         ploth= pg.PlotWidget(title=title)
-         ploth.enableAutoRange(True, True)
-         winpg.setWidget(ploth)
-         ploth.plot(x,y)
-         ploth.setLabel('left',ytitle)
-         ploth.setLabel('bottom',xtitle)
+         w = PyQtGraphGrid(title=title)
+         winpg.setWidget(w)
+         ph = w.addPlot(x=x,y=y,xtitle=xtitle,ytitle=ytitle,**kwargs)
          winpg.show()
+         return ph
 
     def plot3D(self,title="",xtitle="",ytitle=""):
           winpg = QtWidgets.QMdiSubWindow()
