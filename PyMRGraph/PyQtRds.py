@@ -13,6 +13,8 @@ class PyQtRds:
         self.argplot = None
     def setPlotItem(self,pltitem):
         self._plotitem = pltitem
+    def getPlotItem(self):
+        return self._plotitem
     def clearPlotItem(self):
         self._plotitem
     def __del__(self):

@@ -2,7 +2,7 @@
 from PyQt6 import QtCore
 from PyQt6 import QtWidgets, uic, QtGui
 from .PyQtRGraph import PyQtRGraph
-
+import pyqtgraph as pg
 
 
 

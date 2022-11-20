@@ -41,6 +41,7 @@ class PyQtRPlot(pg.PlotWidget):
         pltitem = self.plot(self.dsl[-1].x,self.dsl[-1].y,**kwargs)#,pen=None,symbol='o',symbolSize=0.01,pxMode=False) #,symbolPen=mkPen("r"
         newds.setPlotItem(pltitem)
         newds.argplot = kwargs
+        return newds
         #self.vbox.addWidget(QtWidgets.QPushButton('button')) #for future buttons
 
     def hide_ds(self,ds):

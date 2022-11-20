@@ -60,9 +60,9 @@ class NIFolderTab(QtWidgets.QMainWindow):
             return 1
         c0,c90,c45,c135=Nif.full_ordered_pol()
         x,y = anisotropies(c0,c45,c90,c135)
-        w.addScatterPlot(x[:10000],y[:10000],xtitle="Anisotropy 0/90",ytitle="Anisotropy 45/135")
+        w.addScatterPlot(x=x[:10000],y=y[:10000],xtitle="Anisotropy 0/90",ytitle="Anisotropy 45/135")
         x,y = PSD(c0+c45+c90+c135,nperseg=10000)
-        w.addPlot(x,y,legend=1,dsdes="Sum",logx=1,logy=1,xtitle="Freq (Hz)",ytitle="PSD (V²/Hz)")
+        w.addPlot(x=x,y=y,legend=1,dsdes="Sum",logx=1,logy=1,xtitle="Freq (Hz)",ytitle="PSD (V²/Hz)")
         #w.addPlot(c0,c90,xtitle="c0",ytitle="c90")
         #w.addPlot(c45,c135,xtitle="c45",ytitle="c135")
 
@@ -77,7 +77,7 @@ class NIFolderTab(QtWidgets.QMainWindow):
         x = I0 + 1.j * I1
         x,y = PSD(x,nperseg=10000)
         ind = np.where(np.logical_and(x<1500,x>-1500))
-        w.addPlot(x[ind],y[ind],logx=0,logy=1,xtitle="Freq (Hz)",ytitle="PSD (V²/Hz)")
+        w.addPlot(x=x[ind],y=y[ind],logx=0,logy=1,xtitle="Freq (Hz)",ytitle="PSD (V²/Hz)")
 
 
         return 0
