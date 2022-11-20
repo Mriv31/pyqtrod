@@ -2,7 +2,7 @@
 from PyQt6 import QtCore
 from PyQt6.QtCore import Qt
 from PyQt6 import QtWidgets, uic, QtGui
-from PyQtRGraph import PyQtGraphGrid
+from PyMRGraph import *
 import os, glob
 import numpy as np
 from PyQtFunc import *

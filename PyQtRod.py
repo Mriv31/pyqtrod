@@ -5,7 +5,6 @@ import sys
 sys.path.insert(0, './Modules')
 sys.path.insert(0, './Helpers')
 
-
 from NIfile import NIfile
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import QThreadPool, QCoreApplication, Qt, QPointF, QSize

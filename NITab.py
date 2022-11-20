@@ -14,8 +14,7 @@ import os
 from ModuleDialog import ModuleDialog
 from MatrixDialog import MatrixDialog,MatrixChoose
 
-from PyQtRGraph import PyQtGraphGrid
-
+from PyMRGraph import PyTabGraphMenu, PyQtGraphGrid
 
 
 
@@ -41,6 +40,7 @@ class NITab(QtWidgets.QMainWindow):
         self.imported_modules = []
         self.choose_matrix_menu()
         self.load_all_modules()
+        self.menuBar.addMenu(PyTabGraphMenu("Graph menu",self))
 
     def load_all_modules(self):
         fl = os.listdir("./Modules/")
@@ -220,6 +220,14 @@ class NITab(QtWidgets.QMainWindow):
                 if current_strings[i] == str_to_change:
                     self.pols[i].setCurrentText(new_value)
         self.NIf.orientations[channel] = string
+
+    def get_current_active_widget(self):
+        ac_subwindow = self.mdiArea.activeSubWindow()
+        cw = ac_subwindow.widget()
+        return cw
+
+
+
 
 
     def plot(self,x,y,title="",xtitle="",ytitle="",**kwargs):
