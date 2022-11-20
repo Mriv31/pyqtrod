@@ -56,6 +56,14 @@ cd where_you_want_to_put_the_software/PyQtRod
 python3 PyQtRod.py
 ```
 
+## Load TDMS files
+
+Click File "Load TDMS file"
+
+## Summarize a folder speed and anisotropies
+
+Click File "Summarize folder"
+
 ## Install Jupyter Notebook or Jupyter Lab for interactive data treatment
 Execute from command-line : 
 ```

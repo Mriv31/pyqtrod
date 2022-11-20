@@ -156,7 +156,7 @@ class AnisTraj(QtWidgets.QWidget):
         color=mkColor('w')
         color.setAlphaF(1)
 
-        ds = self.w.add_ds(x=self.I0[:self.npoints],y=self.I1[:self.npoints],pen=None, symbol='o',symbolPen='white',symbolBrush='red',symbolSize=0.005,pxMode=False)
+        ds = self.w.add_ds(x=self.I0[:self.npoints],y=self.I1[:self.npoints],pen=None, symbol='o',symbolPen='white',symbolBrush='white',symbolSize=0.005,pxMode=False)
 
         self.scatter = ds.getPlotItem()
         self.playbutton.setEnabled(True)

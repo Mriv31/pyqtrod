@@ -66,11 +66,11 @@ class NIFolderTab(QtWidgets.QMainWindow):
         #w.addPlot(c0,c90,xtitle="c0",ytitle="c90")
         #w.addPlot(c45,c135,xtitle="c45",ytitle="c135")
 
-
-        im = np.asarray(Image.open(file[:-4]+"tiff"))
-
-
-        w.addImage(im)
+        try:
+            im = np.asarray(Image.open(file[:-4]+"tiff"))
+            w.addImage(im)
+        except:
+            print("No Image file associated to file")
 
         I0 = (c0 - c90) / (c0 + c90)
         I1 = (c45 - c135) / (c45 + c135)
