@@ -9,8 +9,11 @@ from pyqtgraph import mkColor
 from functools import partial
 from corr_matrix import *
 from Fourkas import *
-
-
+from ThetaPhiLine import *
+import importlib
+import ThetaPhiLine
+importlib.reload(ThetaPhiLine)
+from ThetaPhiLine import * # or whatever name you want.
 
 
 class FKtraj(QtWidgets.QWidget):
@@ -26,10 +29,14 @@ class FKtraj(QtWidgets.QWidget):
         self.playbutton.pressed.connect(self.start_animation)
         self.stopbutton.pressed.connect(self.stop_animation)
         self.convolvebutton.pressed.connect(self.do_speed_by_phi_convolve)
+        self.displayphi.pressed.connect(self.display_phi_deg)
+
 
         self.playbutton.setEnabled(False)
         self.stopbutton.setEnabled(False)
         self.convolvebutton.setEnabled(False)
+        self.displayphi.setEnabled(False)
+
 
 
 
@@ -121,6 +128,8 @@ class FKtraj(QtWidgets.QWidget):
         self.stopbutton.setEnabled(False)
         self.timer.stop()
         self.convolvebutton.setEnabled(False)
+        self.displayphi.setEnabled(False)
+
         channels = []
         print(self.start,self.stop)
 
@@ -147,6 +156,8 @@ class FKtraj(QtWidgets.QWidget):
         self.samplesize = len(self.phi)
         self.index = 0
         self.convolvebutton.setEnabled(True)
+        self.displayphi.setEnabled(True)
+
         progress_callback.emit(100)
         return self.v1
 
@@ -194,6 +205,20 @@ class FKtraj(QtWidgets.QWidget):
         color.setAlphaF(0.1)
         self.plt = gl.GLScatterPlotItem(pos=self.v1,size=0.01,pxMode=False,color=color)
         self.w.addItem(self.plt)
+
+        color=mkColor('b')
+        #pm,tm,tms = fittpline(self.theta1,self.phi,nstep=100)
+        #vh = np.column_stack((tms*np.cos(pm),tms*np.sin(pm),np.sqrt(1-tms*tms)))
+
+        pm,tm,tms = fittplinedensity(self.theta1,self.phi,nstep=50)
+        vh = np.column_stack((np.sin(tm)*np.cos(pm),np.sin(tm)*np.sin(pm),np.cos(tm)))
+
+
+        plt = gl.GLScatterPlotItem(pos=vh,size=0.01,pxMode=False,color=color)
+        self.w.addItem(plt)
+
+
+
         color=mkColor('r')
         color.setAlphaF(1)
         plt = gl.GLScatterPlotItem(pos=np.asarray([0,0,0]),color=color,size=0.1,pxMode=False)
@@ -223,3 +248,8 @@ class FKtraj(QtWidgets.QWidget):
 
     def display_convolution_speed(self):
          self.NITab.plot(np.linspace((self.start-self.NITab.NIf.time_off)/self.NITab.NIf.freq,(self.stop-self.NITab.NIf.time_off)/self.NITab.NIf.freq,len(self.speed_phi)),self.speed_phi*self.NITab.NIf.freq/2/np.pi,title="FIR derivative of phi",xtitle="Time (s)", ytitle="Speed ")
+
+    def display_phi_deg(self):
+         self.NITab.plot(np.linspace((self.start-self.NITab.NIf.time_off)/self.NITab.NIf.freq,(self.stop-self.NITab.NIf.time_off)/self.NITab.NIf.freq,len(self.phi)),self.phi*180/np.pi,title="Phi",xtitle="Time (s)", ytitle="Degrees ")
+
+

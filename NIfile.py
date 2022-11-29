@@ -9,7 +9,7 @@ from corr_matrix import *
 
 class NIfile:
     n_signals = 4
-    def __init__(self,path,max_size=20000,dec=100,indstart=0):
+    def __init__(self,path,max_size=20000,dec=100,indstart=0,raw=0):
         self.path = path
         self.max_size = max_size
         self.indstart = 0
@@ -37,13 +37,18 @@ class NIfile:
         self.dec_average = 1
         self.a=[1,1,1,1]
         self.b=[0,0,0,0]
-        self.matcor = T_Icor_Matrix() #0,90,45,135 (45 is reflected)
 
-        inds = self.get_pol_ind(["0","90","45","135"])
-        P = np.zeros([4,4])
-        for i in range(4):
-            P[i,inds[i]]=1
-        self.matcor = np.dot(np.linalg.inv(P),np.dot(self.matcor,P))
+
+        if (raw):
+            self.matcor=np.identity(4)
+        else:
+            self.matcor = T_Icor_Matrix() #0,90,45,135 (45 is reflected)
+
+            inds = self.get_pol_ind(["0","90","45","135"])
+            P = np.zeros([4,4])
+            for i in range(4):
+                P[i,inds[i]]=1
+            self.matcor = np.dot(np.linalg.inv(P),np.dot(self.matcor,P))
 
         self.init_data_share(dec)
 

@@ -191,6 +191,13 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="displayphi">
+     <property name="text">
+      <string>Display phi (deg)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="convolvebutton">
      <property name="text">
       <string>FIR derivative of phi</string>
