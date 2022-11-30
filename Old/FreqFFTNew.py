@@ -1,4 +1,7 @@
 # This Python file uses the following encoding: utf-8
+
+
+# This Python file uses the following encoding: utf-8
 from PyQt6 import QtCore
 from PyQt6 import QtWidgets, uic
 import numpy as np
@@ -8,7 +11,7 @@ from PyQtWorker import PyQtWorker
 
 
 
-class FreqFFT(QtWidgets.QWidget):
+class FreqFFTNew(QtWidgets.QWidget):
     def __init__(self,NITab):
         super(QtWidgets.QWidget, self).__init__()
         uic.loadUi('Modules/FreqFFT.ui', self)
@@ -45,7 +48,7 @@ class FreqFFT(QtWidgets.QWidget):
         self.boxnames = ["C0","C90","C45","C135","ANIS","ITOT"]
 
 
-        NITab.add_tool_widget(self,"FreqFFT")
+        NITab.add_tool_widget(self,"FreqFFTNew")
 
 
     def set_nperseg(self,x):
@@ -85,18 +88,10 @@ class FreqFFT(QtWidgets.QWidget):
     def main_comp(self, progress_callback):
         channels = []
         progress_callback.emit(0)
-        self.computebutton.setEnabled(False)
 
 
 
 
-        C0,C90,C45,C135 = self.NITab.NIf.ret_cor_channel(self.start,self.stop)
-        I0 = (C0 - C90) / (C0 + C90)
-        I1 = (C45 - C135) / (C45 + C135)
-        if (self.anisbox.isChecked()):
-            ANIS = I0 + 1.j * I1
-        if (self.itotbox.isChecked()):
-            ITOT = C90+C0+C45+C135
         res= []
 
         nchecked = 0
@@ -105,18 +100,25 @@ class FreqFFT(QtWidgets.QWidget):
             if b.isChecked():
                 nchecked+=1
 
+        data = np.zeros([4,self.windowsize])
 
         for bi in range(len(self.boxes)):
-            if self.boxes[bi].isChecked():
-                x = locals()[self.boxnames[bi]]
-            else:
+            if self.boxes[bi].isChecked() == 0:
                 continue
 
-            n_seg = int(len(x)/self.overlap) - 1
+            n_seg = int((self.stop-self.start)/self.overlap) - 1
             max_freq = []
             xarr= []
             for i in range(n_seg):
-                f0, Pxx_den0 = signal.welch(x[i*self.overlap:i*self.overlap+self.windowsize], self.NITab.NIf.freq,nperseg=self.nperseg,nfft=self.nfft)
+                C0,C90,C45,C135  = self.NITab.NIf.ret_raw_channels(i*self.overlap,i*self.overlap+self.windowsize,data=data)
+                if self.boxes[bi] is self.anisbox:
+                    I0 = (C0 - C90) / (C0 + C90)
+                    I1 = (C45 - C135) / (C45 + C135)
+                    ANIS = I0 + 1.j * I1
+                if self.boxes[bi] is self.itotbox:
+                    ITOT = C90+C0+C45+C135
+                x = locals()[self.boxnames[bi]]
+                f0, Pxx_den0 = signal.welch(x, self.NITab.NIf.freq,nperseg=self.nperseg,nfft=self.nfft)
                 max_freq.append(f0[np.argmax(Pxx_den0)])
                 xarr.append((self.start + self.overlap*i)/self.NITab.NIf.freq)
                 progress_callback.emit(int(i/n_seg*100*(bi+1)/nchecked))
@@ -135,7 +137,5 @@ class FreqFFT(QtWidgets.QWidget):
                 first = 0
             else:
                 ph.add_ds(xarr,max_freq,name=name)
-        self.computebutton.setEnabled(True)
-
 
 

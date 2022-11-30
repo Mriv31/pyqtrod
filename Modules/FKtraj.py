@@ -210,11 +210,11 @@ class FKtraj(QtWidgets.QWidget):
         #pm,tm,tms = fittpline(self.theta1,self.phi,nstep=100)
         #vh = np.column_stack((tms*np.cos(pm),tms*np.sin(pm),np.sqrt(1-tms*tms)))
 
-        pm,tm,tms = fittplinedensity(self.theta1,self.phi,nstep=50)
+        pm,tm,tms = fittplinedensity(self.theta1,self.phi,nstep=100)
         vh = np.column_stack((np.sin(tm)*np.cos(pm),np.sin(tm)*np.sin(pm),np.cos(tm)))
 
 
-        plt = gl.GLScatterPlotItem(pos=vh,size=0.01,pxMode=False,color=color)
+        plt = gl.GLLinePlotItem(pos=vh,color=color,width=1)
         self.w.addItem(plt)
 
 

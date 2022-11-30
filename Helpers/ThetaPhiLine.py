@@ -5,6 +5,7 @@
 import numpy as np
 from scipy.optimize import curve_fit,minimize
 from functools import partial
+from scipy.interpolate import interp1d
 
 
 def fittpline(theta,phi,nstep=50):
@@ -41,3 +42,10 @@ def fittplinedensity(theta,phi,nstep=50):
         tb.append(res.x[0])
         phiml.append(phim)
     return np.array(phiml),np.array(tb),None
+
+
+def remove_nans_by_interpol(theta,phi,phiml,tb):
+    f = interp1d(phiml,tb,kind="linear")
+    ind = None
+
+

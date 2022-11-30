@@ -137,13 +137,17 @@ class NIfile:
         index = self.get_pol_ind(ordl)
         return data[index[0],:],data[index[1],:],data[index[2],:],data[index[3],:]
 
+    def ret_raw_channels(self,start,stop,ordl=["0","90","45","135"],data=None):
+        for i in range(self.n_signals):
+                data[i,:] = self.channels[i][start:stop]
+        index = self.get_pol_ind(ordl)
+        return data[index[0],:],data[index[1],:],data[index[2],:],data[index[3],:]
+
     def ret_loaded_data(self,ordl=["0","90","45","135"]):
         index = self.get_pol_ind(ordl)
         return self.data[index[0],:],self.data[index[1],:],self.data[index[2],:],self.data[index[3],:]
 
     def update_data_from_file(self,time,norep=0):
-
-
         center = self.time_to_index_in_file([time])[0]
         if (center < self.ld/2*self.dec):
             center = self.ld/2*self.dec
