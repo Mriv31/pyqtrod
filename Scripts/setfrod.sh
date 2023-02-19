@@ -1,0 +1,1 @@
+export PYQT_ACTIVE_FILE=$1

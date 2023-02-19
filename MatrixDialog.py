@@ -92,16 +92,12 @@ class MatrixChoose(QtWidgets.QDialog):
 
    def accept(self):
         if self.option == 1:
-            self.NIf.matcor = T_Icor_Matrix() #0,90,45,135 (45 is reflected)
+            self.NIf.init_optics_matrix()
 
-            inds = self.NIf.get_pol_ind(["0","90","45","135"])
-            P = np.zeros([4,4])
-            for i in range(4):
-                P[i,inds[i]]=1
-            self.NIf.matcor = np.dot(np.linalg.inv(P),np.dot(self.NIf.matcor,P))
 
         else:
-            self.NIf.matcor=np.identity(4)
+            self.NIf.init_unitary_matrix()
+
 
         QtWidgets.QDialog.accept(self)
 

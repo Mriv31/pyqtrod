@@ -116,9 +116,9 @@ class FreqFFT(QtWidgets.QWidget):
             max_freq = []
             xarr= []
             for i in range(n_seg):
-                f0, Pxx_den0 = signal.welch(x[i*self.overlap:i*self.overlap+self.windowsize], self.NITab.NIf.freq,nperseg=self.nperseg,nfft=self.nfft)
+                f0, Pxx_den0 = signal.welch(x[i*self.overlap:i*self.overlap+self.windowsize], self.NITab.NIf.freq/self.NITab.NIf.dec,nperseg=self.nperseg,nfft=self.nfft)
                 max_freq.append(f0[np.argmax(Pxx_den0)])
-                xarr.append((self.start + self.overlap*i)/self.NITab.NIf.freq)
+                xarr.append((self.start + self.overlap*i)/self.NITab.NIf.freq*self.NITab.NIf.dec)
                 progress_callback.emit(int(i/n_seg*100*(bi+1)/nchecked))
             progress_callback.emit(int(100*(bi+1)/nchecked))
             res.append((np.array(xarr),np.array(max_freq),self.boxnames[bi]))

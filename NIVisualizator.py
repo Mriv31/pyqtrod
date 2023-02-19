@@ -66,7 +66,7 @@ class NIVisualizator():
 
 
 
-    def get_visible_pol_channels_raw(self):
+    def get_visible_pol_channels_raw(self): #return raw and decimated
           xa,ya,xb,yb = self.get_lim()
           inds = self.NIf.time_to_index_in_file([xa,xb])
           inda = inds[0]

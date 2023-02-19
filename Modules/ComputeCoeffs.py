@@ -3,6 +3,9 @@ from PyQt6 import QtCore
 from PyQt6 import QtWidgets, uic
 import numpy as np
 import scipy.optimize as optimize
+import corr_matrix
+import importlib
+importlib.reload(corr_matrix)
 from corr_matrix import *
 
 
@@ -13,6 +16,7 @@ class ComputeCoeffs(QtWidgets.QWidget):
         uic.loadUi('Modules/ComputeCoeffs.ui', self)
         NITab.add_tool_widget(self,"ComputeCoeffs")
         self.NITab = NITab
+
         pass
 
 
@@ -24,9 +28,11 @@ class ComputeCoeffs(QtWidgets.QWidget):
 
 
 
+
+
         self.c0,self.c90,self.c45,self.c135 = self.NITab.NIv.get_visible_pol_channels_raw()
 
-        par =  find_best_coeff_using_mat(self.c0,self.c90,self.c45,self.c135,self.NITab.NIf.matcor) #must be used on raw data since apply matrix
+        par =  find_best_coeff_using_mat(self.c0,self.c90,self.c45,self.c135,self.NITab.NIf.matcorb) #must be used on raw data since apply matrix matcorb is the matrix in the 0,90,45,135 base
 
         l90,l45,l135 = par.x
 
@@ -36,5 +42,7 @@ class ComputeCoeffs(QtWidgets.QWidget):
 
         self.NITab.NIf.update_data_from_file(time=-2)
         self.c0,self.c90,self.c45,self.c135 = self.NITab.NIv.get_visible_pol_channels()
+
+
         self.NITab.plot(self.c0+self.c90,self.c45+self.c135,title="After correction",xtitle="C0 + C90",ytitle="C45+C135")
         self.NITab.update_coeffs_buttons()

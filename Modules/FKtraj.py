@@ -205,17 +205,18 @@ class FKtraj(QtWidgets.QWidget):
         color.setAlphaF(0.1)
         self.plt = gl.GLScatterPlotItem(pos=self.v1,size=0.01,pxMode=False,color=color)
         self.w.addItem(self.plt)
+        print(len(self.v1))
 
-        color=mkColor('b')
+        color=mkColor('w')
         #pm,tm,tms = fittpline(self.theta1,self.phi,nstep=100)
         #vh = np.column_stack((tms*np.cos(pm),tms*np.sin(pm),np.sqrt(1-tms*tms)))
 
-        pm,tm,tms = fittplinedensity(self.theta1,self.phi,nstep=100)
-        vh = np.column_stack((np.sin(tm)*np.cos(pm),np.sin(tm)*np.sin(pm),np.cos(tm)))
+        #pm,tm,tms = fittplinedensity(self.theta1,self.phi,nstep=100)
+        #vh = np.column_stack((np.sin(tm)*np.cos(pm),np.sin(tm)*np.sin(pm),np.cos(tm)))
 
 
-        plt = gl.GLLinePlotItem(pos=vh,color=color,width=1)
-        self.w.addItem(plt)
+        #plt = gl.GLLinePlotItem(pos=vh,color=color,width=1)
+        #self.w.addItem(plt)
 
 
 
@@ -251,5 +252,3 @@ class FKtraj(QtWidgets.QWidget):
 
     def display_phi_deg(self):
          self.NITab.plot(np.linspace((self.start-self.NITab.NIf.time_off)/self.NITab.NIf.freq,(self.stop-self.NITab.NIf.time_off)/self.NITab.NIf.freq,len(self.phi)),self.phi*180/np.pi,title="Phi",xtitle="Time (s)", ytitle="Degrees ")
-
-

@@ -2,6 +2,13 @@ import numpy as np
 import statsmodels.api as sm
 from statsmodels.regression.rolling import RollingOLS
 import bottleneck as bn
+
+
+
+
+
+
+
 def fit_single(self, idx, wxpwx, wxpwy, nobs, store, params_only, method):
         if nobs < self._min_nobs:
             return

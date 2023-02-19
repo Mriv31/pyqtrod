@@ -27,6 +27,8 @@ class NITab(QtWidgets.QMainWindow):
         win = self.mdiArea.addSubWindow(self.Visualizator)
         win.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.WindowTitleHint | QtCore.Qt.WindowType.WindowMinMaxButtonsHint | QtCore.Qt.WindowType.SubWindow)
         self.NIv = NIVisualizator(self.rawview,NIf,self.DataSlider)
+        self.choose_matrix_menu()
+
         self.set_file_properties()
         self.pols = [self.pol0,self.pol1,self.pol2,self.pol3]
         self.checkbuttons = [self.check0,self.check1,self.check2,self.check3]
@@ -38,7 +40,6 @@ class NITab(QtWidgets.QMainWindow):
         self.set_coeffs_buttons()
         self.toolmodules = []
         self.imported_modules = []
-        self.choose_matrix_menu()
         self.load_all_modules()
         self.menuBar.addMenu(PyTabGraphMenu("Graph menu",self))
 
@@ -72,12 +73,16 @@ class NITab(QtWidgets.QMainWindow):
         dialog = MatrixDialog("Edit correction matrix",mat=self.NIf.matcor)
         dialog.exec()
         self.NIf.update_data_from_file(time=-2)
+        self.NIv.update_series_from_file()
+
 
 
     def choose_matrix_menu(self):
         dialog = MatrixChoose("Choose correction matrix",file=self.NIf)
         dialog.exec()
         self.NIf.update_data_from_file(time=-2)
+        self.NIv.update_series_from_file()
+
 
 
 

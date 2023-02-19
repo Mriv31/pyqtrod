@@ -24,7 +24,7 @@ def T_Icor_Matrix(): #ordre 0,90,45,135, with 45 reflected
     ret[3][1] = alpha*beta*t
     ret[3][2] = beta*beta*t
     ret[3][3] = alpha*alpha*t
-    return np.linalg.inv(ret)
+    return np.linalg.inv(ret)/8
 
 def correct_with_matrix(c0,c90,c45,c135):
     ac = np.asarray(np.vstack((c0,c90,c45,c135)))
@@ -140,24 +140,24 @@ def find_best_coeff_using_mat(c0,c90,c45,c135,mat):
 
     return result
 
-def true_best_coeff_func(params,ac):
-    a90,a45,a135 = params
-    ap = np.copy(ac)
-    ap[1,:]*=a90
-    ap[2,:]*=a45
-    ap[3,:]*=a135
-    bc = np.dot(T_Icor_Matrix(),ap)
-    c0 = bc[0,:]
-    c90 = bc[1,:]
-    c45 = bc[2,:]
-    c135 = bc[3,:]
-    return np.sum((c0 + c90 - c45-c135)**2)
+#def true_best_coeff_func(params,ac):
+#    a90,a45,a135 = params
+#    ap = np.copy(ac)
+#    ap[1,:]*=a90
+#    ap[2,:]*=a45
+#    ap[3,:]*=a135
+#    bc = np.dot(T_Icor_Matrix(),ap)
+#    c0 = bc[0,:]
+#    c90 = bc[1,:]
+#    c45 = bc[2,:]
+#    c135 = bc[3,:]
+#    return np.sum((c0 + c90 - c45-c135)**2)
 
-def find_best_coeff_using_matrix(c0,c90,c45,c135):
-    ac = np.asarray(np.vstack((c0,c90,c45,c135)))
-    result = minimize(partial(true_best_coeff_func,ac=ac), [1,1,1])
+#def find_best_coeff_using_matrix(c0,c90,c45,c135):
+#    ac = np.asarray(np.vstack((c0,c90,c45,c135)))
+#    result = minimize(partial(true_best_coeff_func,ac=ac), [1,1,1])
 
-    return result
+#    return result
 
 
 def find_best_coeff(c0,c90,c45,c135):

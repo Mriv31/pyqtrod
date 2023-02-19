@@ -1,5 +1,12 @@
 #standard Fourkas with tweaktheta
 import numpy as np
+
+def comp_phiu(c0,c90,c45,c135):
+    phi = 0.5 * np.arctan2((c45/2-c135/2),(c0/2-c90/2))
+    return np.unwrap(phi,period=np.pi)
+
+
+
 def Fourkas(c0,c90,c45,c135,theta0=0,phi0=0,NA=1.3,nw=1.33,tweaktheta=1):
     alpha = np.arcsin(NA/nw)
     A=1/6-1/4*np.cos(alpha)+1/12*np.cos(alpha)**3
