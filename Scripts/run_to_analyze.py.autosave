@@ -1,0 +1,17 @@
+# This Python file uses the following encoding: utf-8
+
+# if __name__ == "__main__":
+#     pass
+
+
+import pandas as pd
+import os
+a = pd.read_excel("Biotin_Helicopters/Sans nom 2.ods", engine="odf")
+toana = a.loc[a['Analyze'] == 1]
+c=toana["Folder"]+"/"+toana["File"]
+files = c.values
+
+for f in files:
+    os.environ["RODF"] = files
+    
+    
