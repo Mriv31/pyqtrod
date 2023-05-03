@@ -14,6 +14,8 @@ def correct_on_speed_step(m,speeds,N=100,fftfilter=1,mfilter=7,show=1): #m is ph
         plt.plot(np.linspace(0,2*np.pi,N),sy,label="Average signal")
 
 
+    if 0 in nn: #if undersampling can not correct non linearities.
+        return lambda x:x
 
     #Here we FFT filter the mean
     if (fftfilter):
@@ -45,4 +47,13 @@ def correct_on_speed_step(m,speeds,N=100,fftfilter=1,mfilter=7,show=1): #m is ph
 
 
     return f
+
+
+def correct_on_diff(phir,phiu,show=0):
+    fcor = correct_on_speed_step(phir[:100000],np.abs(np.diff(phiu[1:100000])),show=1)
+    phirc = fcor(phir)
+    phiuc = np.unwrap(phirc)
+    return phirc,phiuc,fcor
+
+
 

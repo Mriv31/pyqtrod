@@ -34,7 +34,8 @@ class NIFolderTab(QtWidgets.QMainWindow):
 
     def displayFiles(self):
         for f in self.files:
-            self.addGridWidget(f)
+            if not f.endswith("DC2220.tdms"):
+                self.addGridWidget(f)
 
     def addGridWidget(self,file):
         w = PyQtGraphGrid(title=file)

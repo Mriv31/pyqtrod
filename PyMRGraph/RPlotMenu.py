@@ -16,7 +16,13 @@ class DsSelectMenu(QtWidgets.QMenu):
         styler = MenuStyler(self)
 
         for ds in plot.dsl:
-            styler.setColor(ds.description, ds.argplot["pen"])
+            if ds.argplot["pen"] is not None:
+                styler.setColor(ds.description, ds.argplot["pen"])
+            elif ds.argplot["symbolPen"] is not None:
+                styler.setColor(ds.description, ds.argplot["symbolPen"])
+            else:
+                styler.setColor(ds.description, "k")
+
 
 
 class RPlotMenu(QtWidgets.QMenu):

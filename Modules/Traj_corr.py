@@ -1,9 +1,11 @@
 # This Python file uses the following encoding: utf-8
+
+
+from PyQtWorker import PyQtWorker
 from PyQt6 import QtCore
 from PyQt6 import QtWidgets, uic
 import numpy as np
 from scipy import signal
-from PyQtWorker import PyQtWorker
 import pyqtgraph.opengl as gl
 import pyqtgraph as pg
 from pyqtgraph import mkColor
@@ -254,6 +256,8 @@ class Traj_corr(QtWidgets.QWidget):
         color=mkColor('r')
         color.setAlphaF(1)
         plt = gl.GLScatterPlotItem(pos=np.asarray([0,0,0]),color=color,size=0.1,pxMode=False)
+        self.plt.setGLOptions('translucent')
+
         self.w.addItem(plt)
         self.rodline = gl.GLLinePlotItem(pos=np.vstack(([0,0,0],self.v1[0])))
         self.w.addItem(self.rodline)

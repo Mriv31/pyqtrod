@@ -41,7 +41,6 @@ class NITab(QtWidgets.QMainWindow):
         self.toolmodules = []
         self.imported_modules = []
         self.load_all_modules()
-        self.menuBar.addMenu(PyTabGraphMenu("Graph menu",self))
 
     def load_all_modules(self):
         fl = os.listdir("./Modules/")
@@ -233,8 +232,6 @@ class NITab(QtWidgets.QMainWindow):
 
 
 
-
-
     def plot(self,x,y,title="",xtitle="",ytitle="",**kwargs):
          winpg = QtWidgets.QMdiSubWindow()
          winpg.setWindowTitle(title)
@@ -250,6 +247,7 @@ class NITab(QtWidgets.QMainWindow):
           winpg.setWindowTitle(title)
           self.mdiArea.addSubWindow(winpg)
           w = gl.GLViewWidget()
+          w.setBackgroundColor('k')
           w.setWindowTitle(title)
           w.setCameraPosition(distance=40)
           winpg.setWidget(w)
@@ -264,6 +262,7 @@ class NITab(QtWidgets.QMainWindow):
         winpg.setWidget(widget)
         self.mdiArea.addSubWindow(winpg)
         w = gl.GLViewWidget()
+        w.setBackgroundColor('k')
         w.setWindowTitle(title)
         w.setCameraPosition(distance=40)
         layoutgb = QtWidgets.QGridLayout()

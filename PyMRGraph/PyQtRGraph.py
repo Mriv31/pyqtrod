@@ -4,6 +4,8 @@ from PyQt6 import QtWidgets, uic, QtGui
 from .PyQtRPlot import PyQtRPlot
 
 
+# A graph region. Has tabs, a statusbars and contains PyQtRPlots.
+
 
 class PyQtRGraph(QtWidgets.QWidget):
     def __init__(self,**kwargs):
@@ -45,6 +47,7 @@ class PyQtRGraph(QtWidgets.QWidget):
     def add_plot(self,**kwargs):
 
         ploth = PyQtRPlot(parentgraph=self,**kwargs)
+
         self.plotl.append(ploth)
         ploth.parentgraph = self
 

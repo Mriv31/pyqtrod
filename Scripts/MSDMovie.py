@@ -38,7 +38,7 @@ def phi(phi,t1,t2,i=0):
 
 
 def MSD(phi,t1,t2):
-    xar = np.arange(1,2000,100)
+    xar = np.arange(1,200,1)
     result = np.zeros(len(xar))
     meanresult = np.zeros(len(xar))
     for i in range(len(result)):
@@ -46,17 +46,18 @@ def MSD(phi,t1,t2):
           meanresult[i] = np.average(phi[int(xar[i]):] - phi[:-int(xar[i])])
           result[i] = result[i] - meanresult[i]**2
     xar=xar/250000
-    a,b=np.polyfit(xar[1:],result[1:],1)
+    a,b=np.polyfit(xar[20:],result[20:],1)
     a1,b1=np.polyfit(xar,meanresult,1)
 
     f = plt.figure()
     ax = f.gca()
     ax.plot(xar,result)
-    #ax.plot(xar,a*xar+b,label=str(round(2*np.pi*a1/a,1))+"steps per turn")
+    ax.plot(xar,a*xar+b,label=str(round(2*np.pi*a1/a,1))+"steps per turn")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Variance (rad²)")
-    #plt.legend()
+    plt.legend()
     f.savefig(outfolder+"MSD/MSD_phi_{:.3f}_{:.3f}.png".format(t1,t2))
+    plt.close(f)
     return np.array([t1*0.5+t2*0.5]),np.array([2*np.pi*a1/a])
 
 
@@ -69,9 +70,9 @@ def speed_savgold(phi,t1,t2):
     return x[::10],dydt_hat[::10]
 
 
-tstart,tmax = 540,600
+tstart,tmax = 300,1200
 filespeed = file_chuncker(tdmspath,20,speed_savgold,tstart=tstart,tmax=tmax,force=1,dec=100)
-filemsd = file_chuncker(tdmspath,2,MSD,overlap=1,tstart=tstart,tmax=tmax,force=1,dec=1)
+filemsd = file_chuncker(tdmspath,3,MSD,overlap=3,tstart=tstart,tmax=tmax,force=1,dec=1)
 
 hf=h5py.File(filespeed)
 data = hf['data']
@@ -113,9 +114,9 @@ for i in range(len(files)):
     ax3=ax2.twinx()
     print(key1[i])
     ax2.axvspan(float(key1[i]), float(key2[i]), alpha=0.5, color='red')
-    #ax3.plot(datamsd[0,:],datamsd[1,:],'.',c='r',markersize=1)
-    #ax3.set_ylabel("Number of steps per turn")
-    #ax3.set_ylim([0,70])
+    ax3.plot(datamsd[0,:],datamsd[1,:],'.',c='r',markersize=1)
+    ax3.set_ylabel("Number of steps per turn")
+    ax3.set_ylim([0,120])
     fig.savefig(outhistres+"file{:d}.png".format(i),dpi=300)
     plt.close(fig)
 

@@ -11,12 +11,7 @@ import matplotlib.image as mpimg
 import h5py
 import pynumdiff
 from pathlib import Path
-from scipy import ndimage
-from correction_linearity import * # or whatever name you want.
 
-
-
-tstart,tmax = 0,-1
 
 
 tdmspath = os.getenv('RODF')
@@ -27,15 +22,16 @@ os.environ["RODFAN"] = outfolder
 
 from file_chunker import *
 
-if not os.path.exists(outfolder+"histograms_filtered/"):
-    os.makedirs(outfolder+"histograms_filtered/")
-outhist = outfolder+"histograms_filtered/"
+if not os.path.exists(outfolder+"histograms_FFT/"):
+    os.makedirs(outfolder+"histograms_FFT/")
+outhist = outfolder+"histograms_FFT/"
 
-if not os.path.exists(outfolder+"histograms_filtered_res/"):
-    os.makedirs(outfolder+"histograms_filtered_res/")
-outhistres = outfolder+"histograms_filtered_res/"
+if not os.path.exists(outfolder+"histograms_FFT_res/"):
+    os.makedirs(outfolder+"histograms_FFT_res/")
+outhistres = outfolder+"histograms_FFT_res/"
 
 
+phi_ref = -1
 
 
 def phi(phi,t1,t2,i=0):
@@ -46,19 +42,17 @@ def phi(phi,t1,t2,i=0):
 
 
 
-def ECF(phi,t1,t2,i=0):
+def hist(phi,t1,t2,i=0):
+    params=[2,44,41]
+    x_hat, dxdt_hat = pynumdiff.linear_model.savgoldiff(phi[:], 4e-6, params)
 
 
+    phir = x_hat%(2*np.pi)
+    n_f,p=np.histogram(phir,400)
 
-    phir = phi%(2*np.pi)
-    phirc,phiuc =  correct_on_diff(phir,phiu):
+    fft = np.abs(np.fft.rfft(n_f)[1:])
 
-    x_hat = ndimage.median_filter(phir,100)
-
-
-
-    n,p = np.histogram(x_hat,bins=np.linspace(0,2*np.pi,501),density=True)
-    np.save(outfolder+"histograms_filtered/hist_phi_{:.3f}_{:.3f}.npy".format(t1,t2),np.vstack((p[:-1],n)))
+    np.save(outhist+"hist_fft_phi_{:.3f}_{:.3f}.npy".format(t1,t2),fft)#np.vstack((p[:-1],n_f)))
 
     return None,None
 
@@ -72,8 +66,9 @@ def speed_savgold(phi,t1,t2):
     return x[::10],dydt_hat[::10]
 
 
+tstart,tmax = 40,120
 filespeed = file_chuncker(tdmspath,20,speed_savgold,tstart=tstart,tmax=tmax,force=1,dec=100)
-file_chuncker(tdmspath,0.5,hist,overlap=0.25,tstart=tstart,tmax=tmax,force=1,dec=1)
+file_chuncker(tdmspath,2,hist,overlap=1,tstart=tstart,tmax=tmax,force=1,dec=1)
 
 hf=h5py.File(filespeed)
 data1 = hf['data']
@@ -107,20 +102,22 @@ for i in range(len(files)):
     f = files[i]
     fig,(ax1,ax2) = plt.subplots(2,1)
     data = np.load(f)
-    b = data[0,:]
-    n = data[1,:]
-    if (i != 0):
-        nrolled = np.roll(n,int(len(b)/2))
-        if (np.sum(nrolled*nold) > np.sum(n*nold)):
-            n = nrolled
-    nold = n
-    data[1,:] = n
-    np.save(f,data)
+#    b = data[0,:]
+#    n = data[1,:]
+#    if (i != 0):
+#        nrolled = np.roll(n,int(len(b)/2))
+#        if (np.sum(nrolled*nold) > np.sum(n*nold)):
+#            n = nrolled
+#    nold = n
+#    data[1,:] = n
+#    np.save(f,data)
+#    ax1.bar(b,n,width=data[0,1]-data[0,0])
+#ax1.set_xticks([0,np.pi/4,np.pi/2,3*np.pi/4,np.pi,5*np.pi/4,3*np.pi/2,7*np.pi/4,2*np.pi])
+#ax1.set_xticklabels(["0","$\\frac{\pi}{4}$","$\\frac{\pi}{2}$","$\\frac{3\pi}{4}$","$\pi$","$\\frac{5\pi}{4}$","$\\frac{3\pi}{2}$","$\\frac{7\pi}{4}$","$2\pi$"])
 
-    ax1.bar(b,n,width=data[0,1]-data[0,0])
-    ax1.set_xlim([0,2*np.pi])
-    ax1.set_xticks([0,np.pi/4,np.pi/2,3*np.pi/4,np.pi,5*np.pi/4,3*np.pi/2,7*np.pi/4,2*np.pi])
-    ax1.set_xticklabels(["0","$\\frac{\pi}{4}$","$\\frac{\pi}{2}$","$\\frac{3\pi}{4}$","$\pi$","$\\frac{5\pi}{4}$","$\\frac{3\pi}{2}$","$\\frac{7\pi}{4}$","$2\pi$"])
+
+    ax1.plot(data)
+    ax1.set_xlim([0,150])
     ax2.plot(data1[0,:],data1[1,:])
     ax2.set_xlabel("Time(s)")
     ax2.set_ylabel("Freq(Hz)")

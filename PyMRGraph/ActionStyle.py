@@ -12,14 +12,14 @@ class ActionStyle(QtWidgets.QProxyStyle):
         self._colors[text] = color
 
     def drawControl(self, element, option, painter, widget):
-        if element == QtWidgets.QStyle.CE_MenuItem:
+        if element == QtWidgets.QStyle.ControlElement.CE_MenuItem:
             text = option.text
             option_ = QtWidgets.QStyleOptionMenuItem(option)
             if text in self._colors:
                 color = self._colors[text]
             else:
                 color = QtGui.QColor("#A9BBAE")
-            option_.palette.setColor(QtGui.QPalette.Text, color)
+            option_.palette.setColor(QtGui.QPalette.ColorRole.Text, QtGui.QColor(color))
             return self.baseStyle().drawControl(element, option_, painter, widget)
         return self.baseStyle().drawControl(element, option, painter, widget)
 

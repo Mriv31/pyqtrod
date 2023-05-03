@@ -14,6 +14,9 @@ import numpy as np
 import ctypes
 import time
 from NITab import NITab
+from PlotTab import PlotTab
+from PyMRGraph import *
+
 from NIFolderTab import NIFolderTab
 from threading import Thread
 QT_API = "pyqt6"
@@ -27,6 +30,8 @@ class MainWindow(QtWidgets.QMainWindow):
         uic.loadUi('form.ui', self)
         self.setWindowTitle("PyQtRod")
         self.threadpool = QThreadPool()
+        self.menubar.addMenu(PyTabGraphMenu("Graph menu",self))
+
 
 
 
@@ -50,6 +55,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.FileTab.addTab(newtab,path)
         return
 
+    def OpenFile(self):
+        path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open a file', '','TDMS files (*.npy)')
+        if path == ('', ''):
+            returnNITab
+        newtab = PlotTab(path[0]);
+        self.FileTab.addTab(newtab,path[0])
+        self.FileTab.setCurrentWidget(newtab)
+        return
+
+
+    def get_current_active_widget(self):
+        cw = self.FileTab.currentWidget().get_current_active_widget()
+        return cw
 
 if __name__ == "__main__":
 

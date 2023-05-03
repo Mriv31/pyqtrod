@@ -5,16 +5,23 @@ import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 from pyqtgraph import mkPen
 from .PyQtRds import PyQtRds
-
+from .PyQtRViewBox import PyQtRViewBox
+from .InputF import InputF,InputDialog
+# A graph ; subinstace of PlotWidget.
+pg.setConfigOption('background', 'w')
+pg.setConfigOption('foreground', 'k')
 
 class PyQtRPlot(pg.PlotWidget):
     def __init__(self,parentgraph=None,parentgrid=None,x=None,y=None,title="",xtitle="",ytitle="",logx=0,logy=0,**kwargs):
         pg.setConfigOption('useOpenGL', 0)
-        super(PyQtRPlot, self).__init__(title=title)
+        super(PyQtRPlot, self).__init__(title=title,viewBox=PyQtRViewBox())
 
         self.parentgraph = parentgraph
         self.parentgrid = parentgrid
-        self.enableAutoRange(True, True)
+        self.enableAutoRange(False, False)
+        self.setClipToView( True)
+        self.enableAutoRange(False)
+        #self.setDownsampling( ds=None, auto=1, mode="subsample") #Wait for Repair by pyqtgraph team.
         self.setLabel('left',ytitle)
         self.setLabel('bottom',xtitle)
         self.setLogMode(logx,logy)
@@ -26,10 +33,34 @@ class PyQtRPlot(pg.PlotWidget):
         self.dsl=[] #contains the list of ds
         self.addLegend()
 
+
+
         self.add_ds(x,y,**kwargs)
 
+        self.CustomizeMenu()
+
+    def CustomizeMenu(self):
+        pltitem = self.getPlotItem()
+        menu = pltitem.ctrlMenu
+
+        xact = menu.addAction("Set X Label")
+        yact = menu.addAction("Set Y Label")
+
+        xact.triggered.connect(self.set_X_label)
+        yact.triggered.connect(self.set_Y_label)
+
+    def set_X_label(self):
+        title,unit = InputF("Title of X-Axis %s Unit %s")
+        self.setLabel("bottom",text=title,units=unit)
+
+    def set_Y_label(self):
+        title,unit = InputF("Title of Y-Axis %s Unit %s")
+        self.setLabel("left",text=title,units=unit)
+
+
+
     def add_ds(self,x,y,**kwargs):
-        newds = PyQtRds(x,y)
+        newds = PyQtRds(x,y,parentplot=self,**kwargs)
         if "name" in kwargs:
             newds.description = kwargs["name"]
         else:
@@ -38,28 +69,31 @@ class PyQtRPlot(pg.PlotWidget):
         self.dsl.append(newds)
         if not "pen" in kwargs:
             kwargs["pen"] = pg.intColor(len(self.dsl))
-        pltitem = self.plot(self.dsl[-1].x,self.dsl[-1].y,**kwargs)#,pen=None,symbol='o',symbolSize=0.01,pxMode=False) #,symbolPen=mkPen("r"
-        newds.setPlotItem(pltitem)
         newds.argplot = kwargs
+        newds.opts["useCache"] = 1
+
         return newds
         #self.vbox.addWidget(QtWidgets.QPushButton('button')) #for future buttons
+
+
+
 
     def hide_ds(self,ds):
         if ds not in self.dsl:
             raise ValueError("Ds not registered in this plot")
-        self.removeItem(ds._plotitem)
-        ds.clearPlotItem()
+        self.removeDataItem(ds._plotdataitem)
+        ds.clearPlotDataItem()
 
     def show_ds(self,ds):
         if ds not in self.dsl:
             raise ValueError("Ds not registered in this plot")
-        pltitem = self.plot(self.dsl[-1].x,self.dsl[-1].y,ds.argplot)#,pen=None,symbol='o',symbolSize=0.01,pxMode=False) #,symbolPen=mkPen("r"
-        newds.setPlotItem(pltitem)
+        pltdataitem = self.plot(self.dsl[-1].x,self.dsl[-1].y,ds.argplot)#,pen=None,symbol='o',symbolSize=0.01,pxMode=False) #,symbolPen=mkPen("r"
+        newds.setPlotDataItem(pltdataitem)
 
     def clear_ds(self,ds):
         if ds not in self.dsl:
             raise ValueError("Ds not registered in this plot")
-        self.removeItem(ds._plotitem)
+        self.removeDataItem(ds._plotdataitem)
         self.dsl.remove(ds)
         del(ds)
 

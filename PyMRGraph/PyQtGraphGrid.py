@@ -5,6 +5,8 @@ from .PyQtRGraph import PyQtRGraph
 import pyqtgraph as pg
 
 
+#An array of graphs PyQtGraph.
+
 
 class PyQtGraphGrid(QtWidgets.QWidget):
     def __init__(self,title=""):
@@ -33,7 +35,7 @@ class PyQtGraphGrid(QtWidgets.QWidget):
         self._cur_active_w = w
 
     def addScatterPlot(self,*args,**kwargs):
-        newplot = PyQtRGraph(*args, **kwargs,pen=None, symbol='o',symbolPen='red',symbolBrush='red',symbolSize=0.005,pxMode=False)
+        newplot = PyQtRGraph(*args, **kwargs,parentgrid=self,pen=None, symbol='o',symbolPen='red',symbolBrush='red',symbolSize=1,pxMode=True)
         self.layout.addWidget(newplot,self.nexti,self.nextj)
 
         self.increment_grid()

@@ -227,6 +227,8 @@ class FKtraj(QtWidgets.QWidget):
 
         color=mkColor('b')
         plt = gl.GLLinePlotItem(pos=np.vstack(([0,0,0],[0,0,2])),color=color,) #vertical line
+        self.plt.setGLOptions('translucent')
+
         self.w.addItem(plt)
 
 

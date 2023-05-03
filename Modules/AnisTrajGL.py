@@ -2,11 +2,9 @@
 from PyQt6 import QtCore
 from PyQt6 import QtWidgets, uic
 import numpy as np
-from scipy import signal
 from PyQtWorker import PyQtWorker
 import pyqtgraph.opengl as gl
 from pyqtgraph import mkColor
-from functools import partial
 from corr_matrix import *
 from Fourkas import *
 
@@ -157,6 +155,7 @@ class AnisTrajGL(QtWidgets.QWidget):
 
         self.plt = gl.GLScatterPlotItem(pos=self.v1,size=0.01,pxMode=False,color=mkColor("red"))
         self.curplt = gl.GLScatterPlotItem(pos=self.v1[:self.npoints],size=0.01,pxMode=False,color=mkColor("white"))
+        self.plt.setGLOptions('translucent')
 
 
         self.text3D = gl.GLTextItem(pos=[1,1,1],color=mkColor("g"))
@@ -165,6 +164,9 @@ class AnisTrajGL(QtWidgets.QWidget):
 
         self.w.addItem(self.plt)
         self.w.addItem(self.curplt)
+        self.w.show()
+        self.winpg.show()
+
 
 
 

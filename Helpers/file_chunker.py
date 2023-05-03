@@ -32,7 +32,7 @@ def writef(filename,x,y):
 def handler(error):
     print(f'Error: {error}', flush=True)
 
-def file_chuncker(tdmspath,chunk_size,func,tstart=0,tmax=-1,overlap=None,title="",force=0,dec=1,chunks=None,**kwargs):
+def file_chuncker(tdmspath,chunk_size,func,tstart=0,tmax=-1,nworker=-1,overlap=None,title="",force=0,dec=1,chunks=None,**kwargs):
 
     # initialize file chunker
     SyncManager.register("NIfile",NIfile)
@@ -40,7 +40,11 @@ def file_chuncker(tdmspath,chunk_size,func,tstart=0,tmax=-1,overlap=None,title="
 
     manager = mp.Manager()
     q = manager.Queue()
-    pool = mp.Pool(mp.cpu_count()+1)
+    if nworker >0:
+        pool = mp.Pool(nworker)
+    else:
+        pool = mp.Pool(mp.cpu_count()+1)
+
     inst = manager.NIfile(tdmspath,dec=dec,max_size=20)
     freq = inst.get_freq()
     datasize = inst.get_size()
