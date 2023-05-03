@@ -51,6 +51,7 @@
     </property>
     <addaction name="actionLoad_TDMS_file"/>
     <addaction name="actionSummarize_Folder"/>
+    <addaction name="actionOpen_NPY_file"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -59,14 +60,14 @@
     <string>Load TDMS file ... </string>
    </property>
   </action>
-  <action name="actionLoad_PDMS_file">
-   <property name="text">
-    <string>Load PDMS file ...</string>
-   </property>
-  </action>
   <action name="actionSummarize_Folder">
    <property name="text">
     <string>Summarize Folder </string>
+   </property>
+  </action>
+  <action name="actionOpen_NPY_file">
+   <property name="text">
+    <string>Open NPY file</string>
    </property>
   </action>
  </widget>
@@ -104,9 +105,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionOpen_NPY_file</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenFile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>329</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadTDMS()</slot>
   <slot>SumFolder()</slot>
+  <slot>OpenFile()</slot>
  </slots>
 </ui>
