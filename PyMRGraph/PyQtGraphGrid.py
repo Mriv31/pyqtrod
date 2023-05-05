@@ -31,8 +31,6 @@ class PyQtGraphGrid(QtWidgets.QWidget):
         self.increment_grid()
         return newplot
 
-    def set_cur_graph(self,w):
-        self._cur_active_w = w
 
     def addScatterPlot(self,*args,**kwargs):
         newplot = PyQtRGraph(*args, **kwargs,parentgrid=self,pen=None, symbol='o',symbolPen='red',symbolBrush='red',symbolSize=1,pxMode=True)
@@ -55,6 +53,10 @@ class PyQtGraphGrid(QtWidgets.QWidget):
             self.nexti+=1
         else:
             self.nextj+=1
+
+
+
+
 
 
 class QGridLayoutHWFixed(QtWidgets.QGridLayout):

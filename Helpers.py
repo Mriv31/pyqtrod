@@ -8,12 +8,12 @@ import numpy as np
 
 QT_API = "pyqt6"
 
-if QT_API == "pyside2":
-    import shiboken2 as shiboken
-    import ctypes
-elif QT_API == "pyside6":
-    import shiboken6 as shiboken
-    import ctypes
+#if QT_API == "pyside2":
+#    import shiboken2 as shiboken
+#    import ctypes
+#elif QT_API == "pyside6":
+#    import shiboken6 as shiboken
+#    import ctypes
 def array2d_to_qpolygonf(xdata, ydata):
     """
     Utility function to convert two 1D-NumPy arrays representing curve data
@@ -34,8 +34,8 @@ def array2d_to_qpolygonf(xdata, ydata):
         else:
             polyline = QPolygonF()
             polyline.resize(size)
-        address = shiboken.getCppPointer(polyline.data())[0]
-        buffer = (ctypes.c_double * 2 * size).from_address(address)
+        #address = shiboken.getCppPointer(polyline.data())[0]
+        #buffer = (ctypes.c_double * 2 * size).from_address(address)
     else:  # PyQt4, PyQt5
         if QT_API == "pyqt6":
             polyline = QPolygonF([QPointF(0, 0)])

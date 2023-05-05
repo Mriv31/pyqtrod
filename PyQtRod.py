@@ -1,26 +1,17 @@
 # This Python file uses the following encoding: utf-8
-import os
-from pathlib import Path
 import sys
 sys.path.insert(0, './Modules')
 sys.path.insert(0, './Helpers')
 
 from NIfile import NIfile
 from PyQt6 import QtWidgets, uic
-from PyQt6.QtCore import QThreadPool, QCoreApplication, Qt, QPointF, QSize
-from PyQt6.QtCharts import QChartView, QChart, QScatterSeries, QLineSeries
-from PyQt6.QtGui import QPolygonF, QIcon
-import numpy as np
-import ctypes
-import time
+from PyQt6.QtCore import QThreadPool
 from NITab import NITab
 from PlotTab import PlotTab
 from PyMRGraph import *
-
+import PyMRGraph.shared as shared
 from NIFolderTab import NIFolderTab
-from threading import Thread
 QT_API = "pyqt6"
-from pyqtgraph.console import ConsoleWidget
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -56,18 +47,32 @@ class MainWindow(QtWidgets.QMainWindow):
         return
 
     def OpenFile(self):
-        path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open a file', '','TDMS files (*.npy)')
+        path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open a file', '','Npy files (*.npy)')
         if path == ('', ''):
-            returnNITab
+            return
         newtab = PlotTab(path[0]);
         self.FileTab.addTab(newtab,path[0])
         self.FileTab.setCurrentWidget(newtab)
         return
 
+    def saveAsNpz(self):
+        if shared.active_graph == None:
+            return
+        path = QtWidgets.QFileDialog.getSaveFileName(self, 'Save a file', '','Npz (*.npz)')
+        if path == ('', ''):
+            return
+        print("saving" + path[0])
+        shared.active_graph.save(path[0])
 
-    def get_current_active_widget(self):
-        cw = self.FileTab.currentWidget().get_current_active_widget()
-        return cw
+    def LoadNpz(self):
+        path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open a file', '','NPZ files (*.npz)')
+        if path == ('', ''):
+            return
+        newtab = PlotTab(path[0]);
+        self.FileTab.addTab(newtab,path[0])
+        self.FileTab.setCurrentWidget(newtab)
+        return
+
 
 if __name__ == "__main__":
 

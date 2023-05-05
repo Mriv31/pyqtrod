@@ -82,6 +82,8 @@ class NIFolderTab(QtWidgets.QMainWindow):
 
 
         return 0
+    def get_current_active_widget(self):
+        return self.w
 
 
 

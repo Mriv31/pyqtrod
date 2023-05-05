@@ -1,9 +1,5 @@
 # This Python file uses the following encoding: utf-8
-from PyQt6 import QtCore
-from PyQt6 import QtWidgets, uic, QtGui
-import pyqtgraph as pg
-import pyqtgraph.opengl as gl
-from pyqtgraph import mkPen
+from PyQt6 import QtWidgets, QtGui
 from .ActionStyle import MenuStyler
 
 
@@ -12,16 +8,16 @@ class DsSelectMenu(QtWidgets.QMenu):
     def __init__(self,title,parent,plot):
         super(DsSelectMenu, self).__init__(title,parent)
         for ds in plot.dsl:
-            self.addAction(QtGui.QAction(ds.description,self))
+            self.addAction(QtGui.QAction(ds.prop["name"],self))
         styler = MenuStyler(self)
 
         for ds in plot.dsl:
-            if ds.argplot["pen"] is not None:
-                styler.setColor(ds.description, ds.argplot["pen"])
-            elif ds.argplot["symbolPen"] is not None:
-                styler.setColor(ds.description, ds.argplot["symbolPen"])
+            if ds.prop['pen'] is not None:
+                styler.setColor(ds.prop['name'],ds.prop['name'])
+            elif ds.prop['symbolPen'] is not None:
+                styler.setColor(ds.prop['name'], ds.prop['symbolPen'])
             else:
-                styler.setColor(ds.description, "k")
+                styler.setColor(ds.prop['name'], "k")
 
 
 

@@ -52,6 +52,8 @@
     <addaction name="actionLoad_TDMS_file"/>
     <addaction name="actionSummarize_Folder"/>
     <addaction name="actionOpen_NPY_file"/>
+    <addaction name="actionSave_graph_as_npz"/>
+    <addaction name="actionOpen_npz"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -68,6 +70,16 @@
   <action name="actionOpen_NPY_file">
    <property name="text">
     <string>Open NPY file</string>
+   </property>
+  </action>
+  <action name="actionSave_graph_as_npz">
+   <property name="text">
+    <string>Save graph as Npz ...</string>
+   </property>
+  </action>
+  <action name="actionOpen_npz">
+   <property name="text">
+    <string>Open Npz ... </string>
    </property>
   </action>
  </widget>
@@ -121,10 +133,44 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionOpen_npz</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>LoadNpz()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>329</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSave_graph_as_npz</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>saveAsNpz()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>329</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadTDMS()</slot>
   <slot>SumFolder()</slot>
   <slot>OpenFile()</slot>
+  <slot>saveAsNpz()</slot>
+  <slot>LoadNpz()</slot>
  </slots>
 </ui>

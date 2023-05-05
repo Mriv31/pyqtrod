@@ -1,107 +1,152 @@
 # This Python file uses the following encoding: utf-8
-from PyQt6 import QtCore
-from PyQt6 import QtWidgets, uic, QtGui
+from PyQt6 import QtWidgets
 import pyqtgraph as pg
-import pyqtgraph.opengl as gl
-from pyqtgraph import mkPen
 from .PyQtRds import PyQtRds
 from .PyQtRViewBox import PyQtRViewBox
-from .InputF import InputF,InputDialog
+from .RDSMenu import RDSMenu
+import numpy as np
+from .InputF import InputF
+import PyMRGraph.shared as shared
+
 # A graph ; subinstace of PlotWidget.
 pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', 'k')
-
 class PyQtRPlot(pg.PlotWidget):
-    def __init__(self,parentgraph=None,parentgrid=None,x=None,y=None,title="",xtitle="",ytitle="",logx=0,logy=0,**kwargs):
+    def __init__(self,parentgraph=None,parentgrid=None,x=None,y=None,**kwargs):
         pg.setConfigOption('useOpenGL', 0)
-        super(PyQtRPlot, self).__init__(title=title,viewBox=PyQtRViewBox())
+        vb = PyQtRViewBox(parentplot=self)
+        if 'title' in kwargs:
+            title = kwargs['title']
+        else:
+            title = None
+        super(PyQtRPlot, self).__init__(title=title,viewBox=vb)
 
         self.parentgraph = parentgraph
         self.parentgrid = parentgrid
-        self.enableAutoRange(False, False)
-        self.setClipToView( True)
-        self.enableAutoRange(False)
-        #self.setDownsampling( ds=None, auto=1, mode="subsample") #Wait for Repair by pyqtgraph team.
-        self.setLabel('left',ytitle)
-        self.setLabel('bottom',xtitle)
-        self.setLogMode(logx,logy)
-        self.logx = logx
-        self.logy = logy
-        self.set_cross_hair()
         self.dsnb_auto = 0
-
+        self.active_dataset = None
         self.dsl=[] #contains the list of ds
+
+
+
+        self.set_cross_hair()
         self.addLegend()
+        self.CustomizeMenu()
 
+        if 'file' in kwargs and kwargs['file'] is not None:
+            self.init_from_file(kwargs['file'],kwargs['inds'],kwargs['inde'])
+            return
 
+        properties = ['plotname','xtitle','ytitle','xunits','yunits','title','logx','logy']
+        values = [None,None,None,None,None,None,0,0]
+        for i,p in enumerate(properties):
+            if p in kwargs:
+                values[i] = kwargs[p]
+        self.prop = dict(zip(properties[:],values[:]))
+        self.setLabel('left',text=self.prop['ytitle'],units=self.prop['yunits'])
+        self.setLabel('bottom',text=self.prop['xtitle'],units=self.prop['xunits'])
+        self.setLogMode(self.prop['logx'],self.prop['logy'])
 
         self.add_ds(x,y,**kwargs)
 
-        self.CustomizeMenu()
+    def init_from_file(self,f,inds,inde):
+        self.prop=dict(f[f.files[inds]])
+        ind_ds_data = f[f.files[inds+1]]
+        for i in range(ind_ds_data.shape[0]):
+            dinds,dinde = ind_ds_data[i,:]
+            dictio = dict(f[f.files[dinds]])
+            self.add_ds(f[f.files[dinds+1]],f[f.files[dinds+2]],**dictio)
+
 
     def CustomizeMenu(self):
         pltitem = self.getPlotItem()
-        menu = pltitem.ctrlMenu
+        self.menu = pltitem.ctrlMenu
 
-        xact = menu.addAction("Set X Label")
-        yact = menu.addAction("Set Y Label")
+        xact = self.menu.addAction("Set X Label")
+        yact = self.menu.addAction("Set Y Label")
 
         xact.triggered.connect(self.set_X_label)
         yact.triggered.connect(self.set_Y_label)
 
+
+        self.dsmenu =  self.menu.addMenu(RDSMenu("Cur. Dataset",self.menu,self))
+
+        #save = self.menu.addAction("Save all")
+        #save.triggered.connect(self.parentgraph.save)
+
+    def reload_DSMenu(self):
+        self.menu.removeAction(self.dsmenu)
+        self.dsmenu = self.menu.addMenu(RDSMenu("Cur. Dataset",self.menu,self))
+
+
     def set_X_label(self):
         title,unit = InputF("Title of X-Axis %s Unit %s")
         self.setLabel("bottom",text=title,units=unit)
+        self.prop['xtitle']=title
+        self.prop['xunits']=unit
+
 
     def set_Y_label(self):
         title,unit = InputF("Title of Y-Axis %s Unit %s")
         self.setLabel("left",text=title,units=unit)
+        self.prop['ytitle']=title
+        self.prop['yunits']=unit
 
+    def get_active_dataset(self):
+        return self.active_dataset
+
+    def set_active_dataset(self,ds):
+        if ds in self.dsl:
+            self.active_dataset = ds
+            self.reload_DSMenu()
 
 
     def add_ds(self,x,y,**kwargs):
-        newds = PyQtRds(x,y,parentplot=self,**kwargs)
-        if "name" in kwargs:
-            newds.description = kwargs["name"]
+        if 'xArrayLinSorted' in kwargs and kwargs['xArrayLinSorted']==1:
+            self.setClipToView( True)
+            self.enableAutoRange(False)
+            self.setDownsampling( ds=None, auto=1, mode="subsample") #Wait for Repair by pyqtgraph team.
+            self.setXRange(x[0],x[-1])
+            kwargs['autoDownsample']=1
+            kwargs['downsample']=None,
+            kwargs['downsampleMethod']="subsample"
+            kwargs['clipToView'] = True
         else:
-            newds.description = "Dataset "+str(self.dsnb_auto)
-            self.dsnb_auto += 1
-        self.dsl.append(newds)
+             if len(x)>1e6:
+                b,= InputF("This is a long dataset. If it is sorted with linear indices (time series) please enter 1. \n If you don't I will remove scatter indices. %d ")
+                print(b)
+                if int(b) == 1 :
+                    self.setClipToView( True)
+                    self.enableAutoRange(False)
+                    self.setDownsampling( ds=None, auto=1, mode="subsample") #Wait for Repair by pyqtgraph team.
+                    self.setXRange(x[0],x[-1])
+                    kwargs['autoDownsample']=1
+                    kwargs['downsample']=None,
+                    kwargs['downsampleMethod']="subsample"
+                    kwargs['clipToView'] = True
+                    kwargs['xArrayLinSorted']=1
+                else:
+                    kwargs['symbol']=None
+                    kwargs['symbolBrush']=None
+                    kwargs['symbolPen']=None
+        print(kwargs)
+        if "name" in kwargs:
+            dsname = kwargs["name"]
+        else:
+            dsname = "Dataset "+str(self.dsnb_auto)
+        self.dsnb_auto += 1
         if not "pen" in kwargs:
             kwargs["pen"] = pg.intColor(len(self.dsl))
-        newds.argplot = kwargs
+        if 'name' in kwargs:
+            newds = PyQtRds(x,y,parentplot=self,**kwargs,clickable=True)
+        else:
+            newds = PyQtRds(x,y,parentplot=self,name=dsname,**kwargs,clickable=True)
+
         newds.opts["useCache"] = 1
+        self.dsl.append(newds)
 
+        self.active_dataset = newds
         return newds
-        #self.vbox.addWidget(QtWidgets.QPushButton('button')) #for future buttons
-
-
-
-
-    def hide_ds(self,ds):
-        if ds not in self.dsl:
-            raise ValueError("Ds not registered in this plot")
-        self.removeDataItem(ds._plotdataitem)
-        ds.clearPlotDataItem()
-
-    def show_ds(self,ds):
-        if ds not in self.dsl:
-            raise ValueError("Ds not registered in this plot")
-        pltdataitem = self.plot(self.dsl[-1].x,self.dsl[-1].y,ds.argplot)#,pen=None,symbol='o',symbolSize=0.01,pxMode=False) #,symbolPen=mkPen("r"
-        newds.setPlotDataItem(pltdataitem)
-
-    def clear_ds(self,ds):
-        if ds not in self.dsl:
-            raise ValueError("Ds not registered in this plot")
-        self.removeDataItem(ds._plotdataitem)
-        self.dsl.remove(ds)
-        del(ds)
-
-
-        dialog = ModuleDialog("Module Dialog",stringlist=fl2)
-        if (dialog.exec() == QtWidgets.QDialog.Accepted):
-            list_selected_modules = dialog.get_selected_modules()
-
 
     def set_cross_hair(self):
         self.vLine = pg.InfiniteLine(angle=90, movable=False)
@@ -113,8 +158,8 @@ class PyQtRPlot(pg.PlotWidget):
 
 
     def mouseMoved(self,evt):
-        if (self.parentgrid != None):
-            self.parentgrid.set_cur_graph(self)
+        shared.active_plot = self
+        shared.active_graph = self.parentgraph
         pos = evt[0]  ## using signal proxy turns original arguments into a tuple
         if self.sceneBoundingRect().contains(pos):
             mousePoint = self.plotItem.vb.mapSceneToView(pos)
@@ -123,9 +168,9 @@ class PyQtRPlot(pg.PlotWidget):
             self.hLine.setPos(mousePoint.y())
             vx = mousePoint.x()
             vy = mousePoint.y()
-            if self.logx == 1:
+            if self.prop['logx'] == 1:
                 vx = 10**(vx)
-            if self.logy == 1:
+            if self.prop['logy'] == 1:
                 vy = 10**(vy)
 
 
@@ -144,6 +189,21 @@ class PyQtRPlot(pg.PlotWidget):
     def del_from_graph(self):
         if (self.parentgraph != None):
             self.parentgraph.remove_plot(self)
+
+    def save(self,indstart):
+
+        h = [np.array(list(self.prop.items())),0]
+        indstart +=2
+        indarray = np.empty([0,2],dtype="int")
+        for ds in self.dsl:
+            h1 = ds.save() #return arrays saved by plot
+            indarray = np.vstack((indarray,[indstart,indstart+len(h1)])) #keep numbers of arrays in child
+            h+=h1
+            indstart+=len(h1)
+        h[1] = indarray #save arrays from datasets
+
+
+        return h,indstart
 
     def __del__(self):
         for ds in self.dsl:
