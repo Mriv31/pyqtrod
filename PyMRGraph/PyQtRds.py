@@ -4,10 +4,10 @@ import pyqtgraph as pg
 from functools import partial
 import numpy as np
 class PyQtRds(pg.PlotDataItem):
-    def __init__(self,x,y,parentplot=None,params=None,**kwargs):
+    def __init__(self,parentplot=None,params=None,**kwargs):
 
 
-        super(PyQtRds, self).__init__(x=x,y=y,**kwargs)
+        super(PyQtRds, self).__init__(**kwargs)
 
         parentplot.addItem(self)
         self.sigClicked.connect(partial(parentplot.set_active_dataset,self))
@@ -21,9 +21,26 @@ class PyQtRds(pg.PlotDataItem):
 
         self.prop = dict(zip(properties,values))
 
+        if self._dataset is not None:
+            if self._dataset.x is not None:
 
-        self._dataset.x.flags.writeable = False #locks displayed array to find them later
-        self._dataset.y.flags.writeable = False #locks displayed array to find them later
+                self._dataset.x.flags.writeable = False #locks displayed array to find them later
+            if self._dataset.y is not None:
+                self._dataset.y.flags.writeable = False #locks displayed array to find them later
+
+    def change_point_color(self,c):
+        self.setSymbolPen(c)
+
+
+
+    def setData(self,**kwargs):
+        super(PyQtRds, self).setData(**kwargs)
+        if self._dataset is not None:
+            if self._dataset.x is not None:
+
+                self._dataset.x.flags.writeable = False #locks displayed array to find them later
+            if self._dataset.y is not None:
+                self._dataset.y.flags.writeable = False #locks displayed array to find them later
 
     def change_point_color(self,c):
         self.setSymbolPen(c)
@@ -54,9 +71,3 @@ class PyQtRds(pg.PlotDataItem):
 
     def save(self):
         return [np.array(list(self.prop.items())),self._dataset.x,self._dataset.y]
-
-
-
-
-
-

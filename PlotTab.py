@@ -14,35 +14,36 @@ class PlotTab(QtWidgets.QMainWindow):
         self.nextj = 0
 
         self.file = file
-        #self.layout = QtWidgets.QGridLayout()
 
-        #self.scrolled = QtWidgets.QScrollArea()
-
-        #widget = QtWidgets.QWidget()
-        #widget.setLayout(self.layout)
-        #self.setCentralWidget(widget)
-        #self.scrolled.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        #self.scrolled.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        #self.scrolled.setWidgetResizable(True)
-        #self.scrolled.setWidget(widget)
         self.maxcol = 1
         w = PyQtGraphGrid(title=file)
         self.setCentralWidget(w)
         self.w = w
-        #self.layout.addWidget(w,0,0)
-#        data = np.load(file)
-#        if len(data.shape) == 2:
-#            if(data.shape[1] == 2):
-#                x = data[0,:]
-#                y = data[1,:]
-#        else:
-#            y = data[:]
-#            x = np.arange(len(data[:]))
+        if (file.endswith('.npy')):
 
-        #g = w.addScatterPlot(x=x,y=y)
-        #g.add_plot(x=x,y=x)
-        graph = PyQtRGraph(file=file,parentgrid=w)
-        w.addGridWidget(graph)
+            data = np.load(file)
+            if len(data.shape) == 2:
+                if(data.shape[0] == 2):
+                    x = data[0,:]
+                    y = data[1,:]
+                elif(data.shape[1] == 2):
+                    x = data[:,0]
+                    y = data[:,1]
+                else:
+                    print("Format not supported 2 "+str(data.shape[0])+" "+str(data.shape[1]))
+                    return
+            elif len(data.shape) == 1:
+                y = data
+                x = np.arange(len(data),dtype=np.float64)
+            else:
+                print("Format not supported 1")
+                return
+            g = w.addScatterPlot(x=x,y=y)
+
+
+        elif (file.endswith('.npz')):
+            graph = PyQtRGraph(file=file,parentgrid=w)
+            w.addGridWidget(graph)
         pass
 
     def get_current_active_widget(self):

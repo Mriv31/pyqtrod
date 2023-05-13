@@ -129,6 +129,7 @@ class PyQtRPlot(pg.PlotWidget):
                     kwargs['symbol']=None
                     kwargs['symbolBrush']=None
                     kwargs['symbolPen']=None
+                    kwargs['xArrayLinSorted']=0
         print(kwargs)
         if "name" in kwargs:
             dsname = kwargs["name"]
@@ -138,9 +139,12 @@ class PyQtRPlot(pg.PlotWidget):
         if not "pen" in kwargs:
             kwargs["pen"] = pg.intColor(len(self.dsl))
         if 'name' in kwargs:
-            newds = PyQtRds(x,y,parentplot=self,**kwargs,clickable=True)
+            newds = PyQtRds(parentplot=self,**kwargs,clickable=True)
+            newds.setData(x=x,y=y)
         else:
-            newds = PyQtRds(x,y,parentplot=self,name=dsname,**kwargs,clickable=True)
+            newds = PyQtRds(name=dsname,parentplot=self,**kwargs,clickable=True)
+            newds.setData(x=x,y=y)
+
 
         newds.opts["useCache"] = 1
         self.dsl.append(newds)
