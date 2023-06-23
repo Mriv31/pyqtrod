@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 10.0.1, 2023-05-09T16:29:16. -->
+<!-- Written by QtCreator 10.0.1, 2023-06-08T19:05:19. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -407,12 +407,10 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Helpers/Pipeline.py</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/Pipeline.py</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/Pipeline.py</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/Pipeline.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.23">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
@@ -526,12 +524,10 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Helpers/For_Declan_Steps.py</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/For_Declan_Steps.py</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/For_Declan_Steps.py</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/For_Declan_Steps.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.3">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
@@ -999,8 +995,8 @@
   <variable>ProjectExplorer.Project.Target.1</variable>
   <valuemap type="QVariantMap">
    <value type="QString" key="DeviceType">Desktop</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop Qt 6.6.0 GCC 64bit</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop Qt 6.6.0 GCC 64bit</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Replacement for &quot;Desktop Qt 6.6.0 GCC 64bit&quot;</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Replacement for &quot;Desktop Qt 6.6.0 GCC 64bit&quot;</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">qt.qt6.dev.gcc_64_kit</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
@@ -1310,12 +1306,10 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Helpers/Pipeline.py</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/Pipeline.py</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/Pipeline.py</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/Pipeline.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.23">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
@@ -1429,12 +1423,10 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Helpers/For_Declan_Steps.py</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration./home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/For_Declan_Steps.py</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/For_Declan_Steps.py</value>
-    <value type="QString" key="PythonEditor.RunConfiguation.Script">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers/For_Declan_Steps.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/martin/Documents/Post-Doc/datoviz/PyQtRod/Helpers</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.3">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
