@@ -77,8 +77,9 @@ class PyQtRGraph(QtWidgets.QWidget):
         self.plotl.append(ploth)
         self.tab.addTab(ploth,plotname)
         self.tab.setCurrentWidget(ploth)
-
         return ploth
+
+
 
     def remove_plot(self,ploth):
         self.plotl.remove(ploth)

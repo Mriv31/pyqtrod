@@ -27,7 +27,7 @@ class NITab(QtWidgets.QMainWindow):
         win = self.mdiArea.addSubWindow(self.Visualizator)
         win.setWindowFlags(QtCore.Qt.WindowType.CustomizeWindowHint | QtCore.Qt.WindowType.WindowTitleHint | QtCore.Qt.WindowType.WindowMinMaxButtonsHint | QtCore.Qt.WindowType.SubWindow)
         self.NIv = NIVisualizator(self.rawview,NIf,self.DataSlider)
-        self.choose_matrix_menu()
+        #self.choose_matrix_menu()
 
         self.set_file_properties()
         self.pols = [self.pol0,self.pol1,self.pol2,self.pol3]

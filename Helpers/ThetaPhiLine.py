@@ -48,4 +48,60 @@ def remove_nans_by_interpol(theta,phi,phiml,tb):
     f = interp1d(phiml,tb,kind="linear")
     ind = None
 
+from sklearn.linear_model import LinearRegression
+def fourier_fit(theta,phi,nstep=100,nmodes=10):
+    X = np.ones([len(phi),2*nmodes+1])
+    for n in range(nmodes):
+        X[:,2*n] = np.cos((n+1)*phi)
+        X[:,2*n+1] = np.sin((n+1)*phi)
+    reg = LinearRegression(fit_intercept=False).fit(X, theta)
+
+    xar=np.arange(0,2*np.pi,2*np.pi/nstep)
+    X = np.ones([len(xar),2*nmodes+1])
+
+    for n in range(nmodes):
+        X[:,2*n] = np.cos((n+1)*xar)
+        X[:,2*n+1] = np.sin((n+1)*xar)
+
+    return reg.coef_,xar,reg.predict(X)
+
+import numpy as np
+from scipy.optimize import minimize_scalar
+from functools import partial
+from multiprocessing import Pool
+
+def fourier(x,coefficients):
+    n = len(coefficients)//2
+    freqs = np.arange(1,n+1)
+    result = coefficients[2*n]+np.sum(coefficients[:2*n:2]*np.cos(freqs*x)+coefficients[1::2]*np.sin(freqs*x))
+    return result
+
+def f_prime(x,coefficients):
+    n = len(coefficients)//2
+    freqs = np.arange(1,n+1)
+    result = -coefficients[:2*n:2]*freqs*np.sin(freqs*x)+freqs*coefficients[1::2]*np.cos(freqs*x)
+    return result
+
+
+# Define the objective function to minimize (distance between (X, Y) and (X0, f(X0)))
+def objective(coefficients,x, X, Y):
+    return (X-x)**2+(Y-fourier(x,coefficients))**2
+
+
+def optimize_point(coefficients,point):
+    x, y = point
+    result = minimize(lambda x0 : objective(coefficients,x0,x,y ),x0=x)
+
+    return result.x[0]
+
+
+def phi_from_fourier(theta,phir):
+    coefficients,_,_= fourier_fit(theta,phir)
+    coefficients = np.array(coefficients)
+    with Pool(8) as pool:
+        phif = pool.map(partial(optimize_point,coefficients),list(zip(phir,theta)))
+    return phif
+
+
+
 

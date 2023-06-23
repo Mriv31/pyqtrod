@@ -3,7 +3,9 @@ import numpy as np
 from nptdms import TdmsWriter, ChannelObject, TdmsFile
 from corr_matrix import *
 from Fourkas import *
+import os
 import threading
+from correction_linearity import *
 #import cupy as cp
 
 
@@ -42,6 +44,7 @@ class NIfile:
         self.a=[1,1,1,1]
         self.b=[0,0,0,0]
 
+        self.fcor = None #defaut correction function is one
 
         if (raw):
             self.init_unitary_matrix()
@@ -53,8 +56,7 @@ class NIfile:
         if not raw:
             self.correct_channels(int(self.datasize/2),int(self.datasize/2)+100000)
 
-
-
+        self.init_phi_ref()
 
 
  # The functions in this section do not depend on data share function and preallocated self.data variable used for visualization. Note that decimation
@@ -67,6 +69,20 @@ class NIfile:
                     indlist.append(j)
                     break
         return indlist
+
+    def init_phi_ref(self):
+
+        if os.path.isfile(self.path[:-5]+"_phiref.npy"):
+            res = np.load(self.path[:-5]+"_phiref.npy")
+            self.phi_ref = res[1,:]
+            self.ind_ref = res[0,:]
+        else:
+            old_dec = self.dec
+            self.dec = 200
+            self.ind_ref = np.arange(0,self.datasize,self.dec)
+            self.phi_ref = self.ret_phi(0,self.datasize,raw=1,init=1)
+            self.dec = old_dec
+            np.save(self.path[:-5]+"_phiref.npy",np.vstack((self.ind_ref,self.phi_ref)))
 
 
     def ret_index_by_pol(self,pol):
@@ -82,14 +98,20 @@ class NIfile:
 
     def correct_channels(self,start,stop): #No decimation or data share
         c0,c90,c45,c135 = self.ret_raw_channels(start,stop)
+        if os.path.isfile(self.path[:-5]+"_chcor.npy"):
+            arf = np.load(self.path[:-5]+"_chcor.npy")
+            self.a = arf
+            print("Channel corrections set FROM file")
+        else:
+            par =  find_best_coeff_using_mat(c0,c90,c45,c135,self.matcorb) #must be used on raw data since apply matrix matcorb is the matrix in the 0,90,45,135 base
 
-        par =  find_best_coeff_using_mat(c0,c90,c45,c135,self.matcorb) #must be used on raw data since apply matrix matcorb is the matrix in the 0,90,45,135 base
+            l90,l45,l135 = par.x
 
-        l90,l45,l135 = par.x
-
-        self.a[self.ret_index_by_pol("90")] = l90
-        self.a[self.ret_index_by_pol("45")] = l45
-        self.a[self.ret_index_by_pol("135")] = l135
+            self.a[self.ret_index_by_pol("90")] = l90
+            self.a[self.ret_index_by_pol("45")] = l45
+            self.a[self.ret_index_by_pol("135")] = l135
+            np.save(self.path[:-5]+"_chcor.npy",self.a)
+            print("Channel corrections SAVED TO file")
 
         self.update_data_from_file(time=-2)
 
@@ -109,9 +131,59 @@ class NIfile:
         return data[index[0],:],data[index[1],:],data[index[2],:],data[index[3],:]
 
 
-    def ret_phi(self,start,stop): #No decimation or data share
+
+    def set_fcor(self,phiu):
+        if os.path.isfile(self.path[:-5]+"_fcor.npy") and os.path.isfile(self.path[:-5]+"_phiref.npy"):
+            arf = np.load(self.path[:-5]+"_fcor.npy")
+
+            self.fcor = set_fcor_from_array(arf)
+            print("Linearity correction function set FROM file")
+
+        elif phiu is not None:
+            _,_,self.fcor = correct_on_diff(phiu%(2*np.pi),phiu,show=0,fcor=None)
+            xar = np.linspace(0,2*np.pi,200)
+            yar = self.fcor(xar)
+            arf = np.vstack((xar,yar))
+            np.save(self.path[:-5]+"_fcor.npy",arf)
+            print("Linearity correction SAVED TO file")
+
+
+    def ret_phi(self,start,stop,raw=0,init=0):
         c0,c90,c45,c135=self.ret_cor_channel(start,stop)
-        return comp_phiu(c0,c90,c45,c135)
+        phiu = comp_phiu(c0,c90,c45,c135)
+
+        if (init == 0):
+            ref = np.interp(start,self.ind_ref,self.phi_ref)
+            print(np.abs(phiu[0]%(2*np.pi)-ref%(2*np.pi)))
+            if np.abs(phiu[0]%(2*np.pi)-ref%(2*np.pi)) > np.pi/2:
+                phiu += np.pi
+
+        if (raw == 0):
+            if self.fcor is None :
+                self.set_fcor(phiu=phiu)
+            phir = phiu%(2*np.pi)
+            phirc = self.fcor(phir)
+            phiu = np.unwrap(phirc,period=np.pi)
+
+        return phiu
+
+
+    def ret_all_var(self,start,stop,phiraw=0):
+        c0,c90,c45,c135=self.ret_cor_channel(start,stop)
+        phiu,theta1,theta2,Itots2thet,Itots2thet2,Itot,I135 = Fourkas_compItot(c0,c90,c45,c135,NA=1.3,nw=1.33)
+        ref = np.interp(start,self.ind_ref,self.phi_ref)
+        print(np.abs(phiu[0]%(2*np.pi)-ref%(2*np.pi)))
+        if np.abs(phiu[0]%(2*np.pi)-ref%(2*np.pi)) > np.pi/2:
+            phiu += np.pi
+
+        if (phiraw == 0):
+            if self.fcor is None:
+                self.set_fcor(phiu=phiu)
+            phir = phiu%(2*np.pi)
+            phirc = self.fcor(phir)
+            phiu = np.unwrap(phirc,period=np.pi)
+
+        return  phiu,theta1,theta2,Itots2thet,Itots2thet2,Itot,I135
 
 
     def ret_raw_channels(self,start,stop,ordl=["0","90","45","135"],data=None): #No decimation or data share

@@ -15,6 +15,7 @@ def correct_on_speed_step(m,speeds,N=100,fftfilter=1,mfilter=7,show=1): #m is ph
 
 
     if 0 in nn: #if undersampling can not correct non linearities.
+        print("Warning : I did not correct non linearities because of undersampling")
         return lambda x:x
 
     #Here we FFT filter the mean
@@ -48,9 +49,18 @@ def correct_on_speed_step(m,speeds,N=100,fftfilter=1,mfilter=7,show=1): #m is ph
 
     return f
 
+def set_fcor_from_array(arf):
+    xar = arf[0,:]
+    if xar[0] != 0 or xar[-1] != 2*np.pi or (np.all(xar[:-1] <= xar[1:]) == False):
+        print("I have not set fcor, input file was not as expected")
+        return
+    yar = arf[1,:]
+    return CubicSpline(xar,yar)
 
-def correct_on_diff(phir,phiu,show=0):
-    fcor = correct_on_speed_step(phir[:100000],np.abs(np.diff(phiu[1:100000])),show=1)
+def correct_on_diff(phir,phiu,show=0,fcor = None):
+    if fcor is None:
+        print(len(phir))
+        fcor = correct_on_speed_step(phir[:1000000],np.abs(np.diff(phiu[1:1000000])),show=1)
     phirc = fcor(phir)
     phiuc = np.unwrap(phirc)
     return phirc,phiuc,fcor

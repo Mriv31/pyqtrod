@@ -177,9 +177,14 @@ class PyQtRPlot(pg.PlotWidget):
             if self.prop['logy'] == 1:
                 vy = 10**(vy)
 
+            if (self.active_dataset is not None):
+                self.parentgraph.graphstatusbar.setText(" X {0:.2e} Y : {1:.2e} Active dataset is {2}".format(vx,vy,self.active_dataset.prop["name"]))
+            else:
+                self.parentgraph.graphstatusbar.setText(" X {0:.2e} Y : {1:.2e}".format(vx,vy))
 
-            self.parentgraph.graphstatusbar.setText(" X {0:.2e} Y : {1:.2e}".format(vx,vy))
-            #xmin = self.viewRange()[0][0]
+
+
+                #xmin = self.viewRange()[0][0]
             #xmax = self.viewRange()[0][1]
             #ymin = self.viewRange()[1][0]
             #ymax = self.viewRange()[1][1]
@@ -192,7 +197,11 @@ class PyQtRPlot(pg.PlotWidget):
 
     def del_from_graph(self):
         if (self.parentgraph != None):
+            if (shared.active_plot == self):
+                shared.active_plot = None
+                shared.active_graph = None
             self.parentgraph.remove_plot(self)
+
 
     def save(self,indstart):
 

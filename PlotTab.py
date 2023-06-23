@@ -5,7 +5,7 @@ from PyMRGraph import *
 
 import numpy as np
 from PyQtFunc import *
-
+import PyMRGraph.shared as shared
 
 class PlotTab(QtWidgets.QMainWindow):
     def __init__(self,file):
@@ -38,10 +38,13 @@ class PlotTab(QtWidgets.QMainWindow):
             else:
                 print("Format not supported 1")
                 return
-            g = w.addScatterPlot(x=x,y=y)
+            if shared.active_plot is None:
+                g = w.addScatterPlot(x=x,y=y)
+            else:
+                shared.active_plot.add_ds(x=x,y=y)
 
 
-        elif (file.endswith('.npz')):
+        elif (file.endswith('.npz')): #This will always create a new graph
             graph = PyQtRGraph(file=file,parentgrid=w)
             w.addGridWidget(graph)
         pass

@@ -8,12 +8,14 @@ class DsSelectMenu(QtWidgets.QMenu):
     def __init__(self,title,parent,plot):
         super(DsSelectMenu, self).__init__(title,parent)
         for ds in plot.dsl:
-            self.addAction(QtGui.QAction(ds.prop["name"],self))
+            action = QtGui.QAction(ds.prop["name"],self)
+            action.triggered.connect(lambda _,y=ds: plot.set_active_dataset(y))
+            self.addAction(action)
         styler = MenuStyler(self)
 
         for ds in plot.dsl:
             if ds.prop['pen'] is not None:
-                styler.setColor(ds.prop['name'],ds.prop['name'])
+                styler.setColor(ds.prop['name'],ds.prop['pen'])
             elif ds.prop['symbolPen'] is not None:
                 styler.setColor(ds.prop['name'], ds.prop['symbolPen'])
             else:

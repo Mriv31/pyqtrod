@@ -134,16 +134,14 @@ class FKtraj(QtWidgets.QWidget):
         print(self.start,self.stop)
 
 
-        c0,c90,c45,c135 = self.NITab.NIf.ret_cor_channel(self.start,self.stop)
 
         progress_callback.emit(30)
 
 
-        phi,theta1,theta2,Itots2thet,Itots2thet2,Itot,I135 = Fourkas_compItot(c0,c90,c45,c135,NA=1.3,nw=1.33)
+        phi,theta1,theta2,Itots2thet,Itots2thet2,Itot,I135 = self.NITab.NIf.ret_all_var(self.start,self.stop,phiraw=0)
         self.theta1 = theta1
         #theta2 = np.arcsin(np.sqrt((c45-c135)/(2*Itots2thet*C*ss)))
 
-        phi = np.unwrap(phi,period=np.pi)
         progress_callback.emit(70)
 
 
@@ -212,11 +210,14 @@ class FKtraj(QtWidgets.QWidget):
         #vh = np.column_stack((tms*np.cos(pm),tms*np.sin(pm),np.sqrt(1-tms*tms)))
 
         #pm,tm,tms = fittplinedensity(self.theta1,self.phi,nstep=100)
-        #vh = np.column_stack((np.sin(tm)*np.cos(pm),np.sin(tm)*np.sin(pm),np.cos(tm)))
+
+        _,pm,tm = fourier_fit(self.theta1,self.phi,nstep=100)
+
+        vh = np.column_stack((np.sin(tm)*np.cos(pm),np.sin(tm)*np.sin(pm),np.cos(tm)))
 
 
-        #plt = gl.GLLinePlotItem(pos=vh,color=color,width=1)
-        #self.w.addItem(plt)
+        plt = gl.GLLinePlotItem(pos=vh,color=color,width=1)
+        self.w.addItem(plt)
 
 
 
