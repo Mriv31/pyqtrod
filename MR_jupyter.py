@@ -5,13 +5,13 @@ from io import BytesIO
 ipython = get_ipython()
 def dispinline():
     ipython.run_line_magic("matplotlib","inline")
-    plt.style.use('./PyQtRod/mr.mplstyle') #my own style, can remove
+    plt.style.use('../PyQtRod/mr.mplstyle') #my own style, can remove
 
 
 def dispwidget():
-    plt.style.use('./PyQtRod/mr_widget.mplstyle') #my own style, can remove
+    plt.style.use('../PyQtRod/mr_widget.mplstyle') #my own style, can remove
     ipython.run_line_magic("matplotlib" ,"widget")
-    plt.style.use('./PyQtRod/mr_widget.mplstyle') #my own style, can remove
+    plt.style.use('../PyQtRod/mr_widget.mplstyle') #my own style, can remove
 
 def fig2inline(fig):
 

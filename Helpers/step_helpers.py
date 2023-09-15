@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 
 
-def get_ruptures(xt,ar,min_size=0.2,penalty_value=20,show=1,showstepvalue=0,showstep=1,dpi=100):
+def get_ruptures(xt,ar,min_size=10,penalty_value=20,show=1,showstepvalue=0,showstep=1,dpi=100):
     algo_c = rpt.KernelCPD(kernel="linear", min_size=min_size).fit(ar) #"rbf"
     #c = rpt.costs.CostRbf(gamma=1/min_size/min_size)
     #algo_c = rpt.BottomUp(custom_cost=c, jump=10).fit(ar) #"rbf"
@@ -36,6 +36,49 @@ def get_ruptures(xt,ar,min_size=0.2,penalty_value=20,show=1,showstepvalue=0,show
             plt.text(xbound[j],m[j],str(round(stepsize[j],1))+"°",fontsize=10)
 
     return xbound,m
+
+def get_ruptures_mm(xt,ar,min_size=10,min_deg_size=10,penalty_value=20,show=1,showstepvalue=0,showstep=1,dpi=100):
+    algo_c = rpt.KernelCPD(kernel="linear", min_size=min_size).fit(ar) #"rbf"
+    #c = rpt.costs.CostRbf(gamma=1/min_size/min_size)
+    #algo_c = rpt.BottomUp(custom_cost=c, jump=10).fit(ar) #"rbf"
+
+    result = algo_c.predict(pen=penalty_value)
+    print("Change points found, now splitting data")
+
+    m = [np.mean(a) for a in np.hsplit(ar, result)]
+    m = m[:-2]
+    xbound=xt[result[:-1]]
+
+    stepsize = np.diff(m)*180/np.pi
+
+
+    intbg = np.where(np.abs(stepsize)<min_deg_size)
+    result = np.delete(result,intbg)
+
+
+    m = [np.mean(a) for a in np.hsplit(ar, result)]
+    m = m[:-2]
+    xbound=xt[result[:-1]]
+
+    print("Finished. Now showing")
+
+    if (show):
+        plt.figure(dpi=dpi)
+        plt.plot(xt,ar)
+        if (showstep):
+            plt.step(xbound,m)
+            plt.title("penalty = "+str(penalty_value)+"; min_value = "+"{:.2e}".format(min_deg_size)+"°")
+
+        plt.ylabel("Rotation angle (rad)")
+        plt.xlabel("Time (s)")
+
+    if (showstepvalue):
+        stepsize = np.diff(m)*180/np.pi
+        for j in range(len(xbound)-1):
+            plt.text(xbound[j],m[j],str(round(stepsize[j],1))+"°",fontsize=10)
+
+    return xbound,m
+
 
 
 def step_properties(xbound,m):
@@ -92,4 +135,3 @@ def step_vs_param(xt,ar,pen_ar,plot=1):
 
 
     return pen_ar, upl, upd
-

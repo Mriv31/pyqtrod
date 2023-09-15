@@ -39,6 +39,7 @@ class ComputeCoeffs(QtWidgets.QWidget):
         self.NITab.NIf.a[self.NITab.NIf.ret_index_by_pol("90")] = l90
         self.NITab.NIf.a[self.NITab.NIf.ret_index_by_pol("45")] = l45
         self.NITab.NIf.a[self.NITab.NIf.ret_index_by_pol("135")] = l135
+        np.save(self.NITab.NIf.path[:-5]+"_chcor.npy",self.NITab.NIf.a)
 
         self.NITab.NIf.update_data_from_file(time=-2)
         self.c0,self.c90,self.c45,self.c135 = self.NITab.NIv.get_visible_pol_channels()
