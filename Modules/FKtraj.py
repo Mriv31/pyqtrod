@@ -14,7 +14,7 @@ import importlib
 import ThetaPhiLine
 importlib.reload(ThetaPhiLine)
 from ThetaPhiLine import * # or whatever name you want.
-
+import os
 
 class FKtraj(QtWidgets.QWidget):
     def __init__(self,NITab):
@@ -30,7 +30,7 @@ class FKtraj(QtWidgets.QWidget):
         self.stopbutton.pressed.connect(self.stop_animation)
         self.convolvebutton.pressed.connect(self.do_speed_by_phi_convolve)
         self.displayphi.pressed.connect(self.display_phi_deg)
-
+        self.show_transitions_button.pressed.connect(self.show_transitions)
 
         self.playbutton.setEnabled(False)
         self.stopbutton.setEnabled(False)
@@ -69,11 +69,46 @@ class FKtraj(QtWidgets.QWidget):
         self.npointsslider.setValue(self.npoints)
         self.stepslider.setValue(self.step)
 
-
+        self.maxlength = 1e6
 
         NITab.add_tool_widget(self,"FKtraj")
 
+    def show_transitions(self):
+        def extract_integer(filename):
+                return int(filename.split('_')[1].split(".")[0])
+        f = self.NITab.NIf
+        folder = f.path[:-5]+"_analysis/transitions/"
+        if os.path.isdir(folder) == 0:
+            return
+        fl = os.listdir(folder)
+        fl = sorted(fl, key=extract_integer)
+        mt = np.empty([])
+        xt = np.empty([])
+        for fi in fl:
+            print(fi)
+            tr = np.load(folder+fi)
+            m = tr["m"]*180/np.pi
 
+            xbound = tr["xbound"]
+            indphi = int((xbound[0]-self.NITab.NIf.time_off)*self.NITab.NIf.freq)
+            if (indphi < self.start) or (indphi > self.stop):
+                continue
+            nextvalue = self.phi[(indphi-self.start)//self.NITab.NIf.dec]*180/np.pi
+            print(nextvalue,m[0])
+            mh = m[0]
+            i = 0
+            while nextvalue-mh > 90:
+                mh += 180
+                i += 1
+            while nextvalue-mh < -90:
+                mh -= 180
+                i -= 1
+            m = m+180*i
+
+            mt = np.hstack((mt,m))
+            xt = np.hstack((xt,xbound))
+
+        self.plotphi.add_ds(xt,mt,stepMode="left",pen="red")
 
     def set_conv_window(self,x):
         self.convolutionwindow = x
@@ -137,19 +172,22 @@ class FKtraj(QtWidgets.QWidget):
 
         progress_callback.emit(30)
 
-
-        phi,theta1,theta2,Itots2thet,Itots2thet2,Itot,I135 = self.NITab.NIf.ret_all_var(self.start,self.stop,phiraw=0)
-        self.theta1 = theta1
+        if ((self.stop-self.start)/self.NITab.NIf.dec<self.maxlength):
+            phi,theta1,theta2,Itots2thet,Itots2thet2,Itot,I135 = self.NITab.NIf.ret_all_var(self.start,self.stop,phiraw=self.rawdatabutton.isChecked())
+            self.theta1 = theta1
         #theta2 = np.arcsin(np.sqrt((c45-c135)/(2*Itots2thet*C*ss)))
 
-        progress_callback.emit(70)
+            progress_callback.emit(70)
 
 
-        self.v1 = np.column_stack((np.sin(theta1)*np.cos(phi),np.sin(theta1)*np.sin(phi),np.cos(theta1)))
+            self.v1 = np.column_stack((np.sin(theta1)*np.cos(phi),np.sin(theta1)*np.sin(phi),np.cos(theta1)))
         #v2 = np.array([np.sin(theta0)*np.cos(phi0),np.sin(theta0)*np.sin(phi0),np.cos(theta0)])
         #fac = v1.transpose().dot(v2)
         #Itot = Itots2thet / np.sin(theta1)**2
-        self.v1[np.isnan(self.v1)] = 0
+            self.v1[np.isnan(self.v1)] = 0
+
+        else:
+            phi = self.NITab.NIf.ret_phi(self.start,self.stop,raw=self.rawdatabutton.isChecked())
         self.phi = phi
         self.samplesize = len(self.phi)
         self.index = 0
@@ -192,7 +230,7 @@ class FKtraj(QtWidgets.QWidget):
 
 
     def display_result(self,res):
-        if (len(self.phi) > 2e6):
+        if (len(self.phi) > 0.9*self.maxlength):
             return
 
         self.winpg,self.w = self.NITab.plot3D(title="3D plot - FKtraj")
@@ -254,4 +292,4 @@ class FKtraj(QtWidgets.QWidget):
          self.NITab.plot(np.linspace((self.start-self.NITab.NIf.time_off)/self.NITab.NIf.freq,(self.stop-self.NITab.NIf.time_off)/self.NITab.NIf.freq,len(self.speed_phi)),self.speed_phi*self.NITab.NIf.freq/2/np.pi,title="FIR derivative of phi",xtitle="Time (s)", ytitle="Speed ")
 
     def display_phi_deg(self):
-         self.NITab.plot(np.linspace((self.start-self.NITab.NIf.time_off)/self.NITab.NIf.freq,(self.stop-self.NITab.NIf.time_off)/self.NITab.NIf.freq,len(self.phi)),self.phi*180/np.pi,title="Phi",xtitle="Time (s)", ytitle="Degrees ")
+         self.plotphi = self.NITab.plot(np.linspace((self.start-self.NITab.NIf.time_off)/self.NITab.NIf.freq,(self.stop-self.NITab.NIf.time_off)/self.NITab.NIf.freq,len(self.phi)),self.phi*180/np.pi,title="Phi",xtitle="Time (s)", ytitle="Degrees ",pen=None,symbolPen = "black",symbolSize=2,symbol="o",symbolBrush="black")

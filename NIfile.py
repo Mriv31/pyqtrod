@@ -13,7 +13,7 @@ from correction_linearity import *
 
 class NIfile:
     n_signals = 4
-    def __init__(self,path,max_size=20000,dec=100,indstart=0,raw=0):
+    def __init__(self,path,max_size=20000,dec=100,indstart=0,rawoptics=0,decref=200):
         self.path = path
         self.tdms_lock = threading.Lock()
 
@@ -31,11 +31,19 @@ class NIfile:
             self.channelnames = [i.name for i in self.channels]
             self.orientations = ["90","45","135","0"]
             self.groupnb = len(self.tdms_file.groups())
+            try:
 
-            self.time_inc = self.channels[0].properties['wf_increment']
-            self.time_off = self.channels[0].properties['wf_start_offset']
-            self.starttime = self.channels[0].properties['wf_start_time']
-            self.freq = 1/self.time_inc
+                self.time_inc = self.channels[0].properties['wf_increment']
+                self.time_off = self.channels[0].properties['wf_start_offset']
+                self.starttime = self.channels[0].properties['wf_start_time']
+                self.freq = 1/self.time_inc
+
+            except:
+                self.time_inc = 4e-6
+                self.freq = 1/self.time_inc
+                self.time_off = 0
+                self.starttime = np.array([0])
+                print('Warning : metadata broken, added time_inc manually')
         except:
             TdmsFile.close(self.path)
             raise ValueError("Problem loading file "+path)
@@ -46,17 +54,16 @@ class NIfile:
 
         self.fcor = None #defaut correction function is one
 
-        if (raw):
+        if (rawoptics):
             self.init_unitary_matrix()
         else:
             self.init_optics_matrix()
 
         self.init_data_share(dec)
 
-        if not raw:
+        if not rawoptics:
             self.correct_channels(int(self.datasize/2),int(self.datasize/2)+100000)
-
-        self.init_phi_ref()
+            self.init_phi_ref(decref)
 
 
  # The functions in this section do not depend on data share function and preallocated self.data variable used for visualization. Note that decimation
@@ -70,15 +77,15 @@ class NIfile:
                     break
         return indlist
 
-    def init_phi_ref(self):
+    def init_phi_ref(self,decref):
 
         if os.path.isfile(self.path[:-5]+"_phiref.npy"):
             res = np.load(self.path[:-5]+"_phiref.npy")
             self.phi_ref = res[1,:]
             self.ind_ref = res[0,:]
-        else:
+        else: #initialize reference for the whole file to be sure there is no pi error
             old_dec = self.dec
-            self.dec = 200
+            self.dec = decref
             self.ind_ref = np.arange(0,self.datasize,self.dec)
             self.phi_ref = self.ret_phi(0,self.datasize,raw=1,init=1)
             self.dec = old_dec
@@ -96,12 +103,19 @@ class NIfile:
             if self.orientations[i] == pol:
                 return i
 
+
+    def save_coeff_to_file(self):
+        np.save(self.path[:-5]+"_chcor.npy",self.a)
+        print("Channel corrections SAVED TO file")
+
+
+
     def correct_channels(self,start,stop): #No decimation or data share
         c0,c90,c45,c135 = self.ret_raw_channels(start,stop)
         if os.path.isfile(self.path[:-5]+"_chcor.npy"):
             arf = np.load(self.path[:-5]+"_chcor.npy")
             self.a = arf
-            print("Channel corrections set FROM file")
+            #rfprint("Channel corrections set FROM file",a[0],a[1],a[2],a[3])
         else:
             par =  find_best_coeff_using_mat(c0,c90,c45,c135,self.matcorb) #must be used on raw data since apply matrix matcorb is the matrix in the 0,90,45,135 base
 
@@ -110,8 +124,7 @@ class NIfile:
             self.a[self.ret_index_by_pol("90")] = l90
             self.a[self.ret_index_by_pol("45")] = l45
             self.a[self.ret_index_by_pol("135")] = l135
-            np.save(self.path[:-5]+"_chcor.npy",self.a)
-            print("Channel corrections SAVED TO file")
+            self.save_coeff_to_file()
 
         self.update_data_from_file(time=-2)
 
@@ -148,23 +161,33 @@ class NIfile:
             print("Linearity correction SAVED TO file")
 
 
-    def ret_phi(self,start,stop,raw=0,init=0):
-        c0,c90,c45,c135=self.ret_cor_channel(start,stop)
-        phiu = comp_phiu(c0,c90,c45,c135)
+    def ret_phi(self,start,stop,raw=0,init=0,cutwindow= None):
+        if (cutwindow is not None):
+            phiu = np.empty([])
+            windowrange = np.arange(start,stop,cutwindow).astype("int")
+            for w in windowrange:
 
-        if (init == 0):
+                c0,c90,c45,c135=self.ret_cor_channel(w,np.min([w+cutwindow,stop]))
+                phiu = np.hstack((phiu,comp_phiu(c0,c90,c45,c135)))
+        else:
+            c0,c90,c45,c135=self.ret_cor_channel(start,stop)
+            phiu = comp_phiu(c0,c90,c45,c135)
+
+        if (init == 0): #if not the first loading I do have a reference so that I can compare to that one
             ref = np.interp(start,self.ind_ref,self.phi_ref)
             print(np.abs(phiu[0]%(2*np.pi)-ref%(2*np.pi)))
             if np.abs(phiu[0]%(2*np.pi)-ref%(2*np.pi)) > np.pi/2:
                 phiu += np.pi
 
-        if (raw == 0):
+        if (raw == 0): #this is the non linearity
             if self.fcor is None :
                 self.set_fcor(phiu=phiu)
             phir = phiu%(2*np.pi)
             phirc = self.fcor(phir)
             phiu = np.unwrap(phirc,period=np.pi)
-
+        if (cutwindow is not None):
+            phir = phiu%(2*np.pi)
+            phiu = np.unwrap(phir,period=np.pi)
         return phiu
 
 
@@ -182,6 +205,9 @@ class NIfile:
             phir = phiu%(2*np.pi)
             phirc = self.fcor(phir)
             phiu = np.unwrap(phirc,period=np.pi)
+        else:
+            phiu = np.unwrap(phiu,period=np.pi)
+
 
         return  phiu,theta1,theta2,Itots2thet,Itots2thet2,Itot,I135
 
@@ -335,4 +361,3 @@ class NIfile:
 #        self.minxmem = np.min(np.asarray(self.xs))
 #        self.maxxmem = np.max(np.asarray(self.xs))
 #        return 0
-

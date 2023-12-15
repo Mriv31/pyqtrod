@@ -9,14 +9,13 @@ sys.path.insert(0, os.path.dirname(sys.path[0]))
 from NIfile import NIfile
 from multiprocessing.managers import SyncManager
 
-outfolder=os.getenv("RODFAN")
-
+outfolder=""
 
 def kwargs_to_string(**kwargs):
     return "_".join(f"{key}_{value}" for key, value in kwargs.items())
 
 def worker1(c1,c2,f,func,q,**kwargs):
-    phi = f.ret_phi(int(c1),int(c2))
+    phi = f.ret_phi(int(c1),int(c2),raw=0)
     x,y=func(phi,c1/f.get_freq(),c2/f.get_freq(),**kwargs) #time given by the freq
     if (x is None or y is None):
         return None

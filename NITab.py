@@ -165,6 +165,9 @@ class NITab(QtWidgets.QMainWindow):
             nb.valueChanged.connect(partial(self.NIv.set_b,channel = i))
             self.bbut.append(nb)
 
+        button = QtWidgets.QPushButton("Save coefficient to file")
+        button.clicked.connect(self.NIf.save_coeff_to_file)
+        layout.addWidget(button)
         self.toolBox_2.addItem(qg,"Corr coeffs")
 
     def update_coeffs_buttons(self):
@@ -278,4 +281,3 @@ class NITab(QtWidgets.QMainWindow):
         w.sizeHint = lambda: pg.QtCore.QSize(100, 100)
         w.setSizePolicy(ploth.sizePolicy())
         return winpg,w,ploth
-

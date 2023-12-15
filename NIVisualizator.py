@@ -2,7 +2,7 @@
 from PyQt6.QtCore import  Qt
 from PyQt6.QtCharts import  QScatterSeries, QLineSeries, QValueAxis
 from PyQt6.QtGui import  QShortcut,QKeySequence
-from Helpers import array2d_to_qpolygonf
+from qPolygonF import array2d_to_qpolygonf
 import numpy as np
 import os
 class NIVisualizator():
@@ -100,8 +100,8 @@ class NIVisualizator():
         self.NIf.b[channel] = value
         self.NIf.update_data_from_file(time=-2)
         self.update_series_from_file()
-        
-        
+
+
     def init_series_from_file(self):
         chart = self.chart
 
@@ -258,8 +258,3 @@ class NIVisualizator():
         else:
             return
         self.update_series_from_file()
-
-
-
-
-

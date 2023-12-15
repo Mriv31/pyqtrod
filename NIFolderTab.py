@@ -55,7 +55,7 @@ class NIFolderTab(QtWidgets.QMainWindow):
 
     def displayNIfileSum(self,file,w):
         try:
-            Nif = NIfile(file,dec=1,max_size=100000)
+            Nif = NIfile(file,dec=1,max_size=100000,rawoptics=1)
         except:
             print("Error loading file "+file)
             return 1
@@ -84,6 +84,3 @@ class NIFolderTab(QtWidgets.QMainWindow):
         return 0
     def get_current_active_widget(self):
         return self.w
-
-
-

@@ -77,7 +77,7 @@ def get_ruptures_mm(xt,ar,min_size=10,min_deg_size=10,penalty_value=20,show=1,sh
         for j in range(len(xbound)-1):
             plt.text(xbound[j],m[j],str(round(stepsize[j],1))+"°",fontsize=10)
 
-    return xbound,m
+    return xbound,m,result[:-1]
 
 
 

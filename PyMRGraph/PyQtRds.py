@@ -28,8 +28,6 @@ class PyQtRds(pg.PlotDataItem):
             if self._dataset.y is not None:
                 self._dataset.y.flags.writeable = False #locks displayed array to find them later
 
-    def change_point_color(self,c):
-        self.setSymbolPen(c)
 
 
 
