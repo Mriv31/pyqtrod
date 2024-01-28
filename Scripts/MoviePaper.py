@@ -234,3 +234,64 @@ def format_milliseconds(microseconds):
 
     formatted_time = f"{int(minutes):01d} min {int(seconds):02d} sec {int(milliseconds):03d} ms {int(round(microseconds)):03d} μs"
     return formatted_time
+
+
+fig = plt.figure(figsize=(12, 12))
+from matplotlib.gridspec import GridSpec
+gs = GridSpec(2, 4, figure=fig)
+ax1 = fig.add_subplot(gs[0,:2])  # First subplot
+ax = fig.add_subplot(gs[0,2:],projection='3d',computed_zorder=False)  # Second subplot
+ax.set_xlim([0, 1])  # Set x-axis limits
+ax.set_ylim([0, 1])  # Set y-axis limits
+ax.set_zlim([0, 1])
+ax.set_facecolor('black')
+ax3 = fig.add_subplot(gs[1,:3])  # Third subplot
+ax4 = fig.add_subplot(gs[1,3],projection="polar")  # Fourth subplot
+ax4.set_xticklabels([])
+ax4.set_yticklabels([])
+fig.subplots_adjust(hspace=0.3,wspace=0.2)
+
+# Remove axis ticks
+ax4.set_xticks([])
+ax4.set_yticks([])
+
+# Remove grid lines
+ax4.xaxis.grid(False)
+ax4.yaxis.grid(False)
+
+# Remove axis lines
+#ax4.spines['polar'].set_visible(False)
+time0 = 12438.4
+init_fig(dec=0)
+
+folder = "C:/Users/rieu/OneDrive - Nexus365/paper1/suppmovie/2023_02_10_MTB24_file6/slowdown2_fixed_y/"
+if os.path.isdir(folder) == 0:
+    os.mkdir(folder)
+
+listr = [[12.4384,12.4406,4e-6,1,10,2500]] #fast
+listr = [[12.45,14.55,1e-3,50,10,2500]] #accelerated
+listr = [[166.76,170.9995,1e-2,800,10,25000]] #steps
+listr = [[14.5,15,1e-3,50,10,25000]] #slowdown
+
+timelist = []
+aziutlist = []
+wslist = []
+wdisplaymslist = []
+wredslist = []
+for li in listr[:]:
+    nel = list(np.arange(li[0],li[1],li[2]))
+    timelist +=nel
+    wdisplaymslist += [li[3]]*len(nel)
+    wslist += [li[4]]*len(nel)
+    aziutlist += list(-20 + 180*np.linspace(phiuh[int(li[0]*250000)],phiuh[int(li[1]*250000)],len(nel))/np.pi)
+    wredslist += [li[5]]*len(nel)
+
+for i in range(len(timelist)):
+     wdisplayms = wdisplaymslist[i]
+     wdisplayfr  = int(wdisplayms*250)
+     wreds=wredslist[i]
+     #wreds= wdisplayms*5
+     ws = wslist[i]
+     aziut = aziutlist[i]
+     update_plot(timelist[i])
+     plt.savefig(folder+f"image{timelist[i]:.6f}.png")
