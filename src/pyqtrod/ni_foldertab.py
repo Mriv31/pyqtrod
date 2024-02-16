@@ -10,11 +10,11 @@ from PIL import Image
 
 
 class NIFolderTab(QtWidgets.QMainWindow):
-    def __init__(self, NIfolder):
+    def __init__(self, NIfolder, png_instance=None):
         super(NIFolderTab, self).__init__()
         self.nexti = 0
         self.nextj = 0
-
+        self.png_instance = png_instance
         self.fold = NIfolder
         self.layout = QtWidgets.QGridLayout()
 
