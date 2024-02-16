@@ -108,6 +108,14 @@ If this does not work, you can also enforce the usage of nvidia graphic card all
 sudo prime-query nvidia
 ```
 
+
+## Third-Party Acknowledgment
+
+This software uses the Qt frameworkfor its graphical user interface and other functionalities. Qt is available under the GNU Lesser General Public License (LGPL) version 3, and the GNU General Public License (GPL) version 2/3. The full texts of these licenses are included in the 'licenses' directory of this distribution.
+
+Qt is a trademark of The Qt Company Ltd and is used under license. For more information on Qt, please visit [Qt's official website](https://www.qt.io/).
+
+
 ## Authors and acknowledgment
 TODO
 ## License

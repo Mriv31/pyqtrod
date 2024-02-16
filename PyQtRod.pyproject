@@ -1,3 +1,36 @@
 {
-    "files": ["PyMRGraph/InputF.py","Scripts/MSDMovie.py","Scripts/MSD_speed.py","Modules/ComputeCoeffs.py","Scripts/Analysis/ECF_average.py","Modules/Traj_corr.ui","Helpers.py","PlotTab.py","PyMRGraph/RPlotMenu.py","corr_matrix.py","PyMRGraph/RPlotMenu (copie).py","Scripts/allana.py","PyQtRGraph/RPlotMeny.py","PyQtRGraph/PyQtRGraph.py","PyQtRGraph/PyQtRGraphMenu.py","PyQtRGraph/PyTabGraphMenu.py","Modules/FreqFFT.ui","PyQtRGraph/__init__.py","PyQtRGraph/RDSMenu.py","Helpers/correction_linearity.py","Helpers/corr_matrix.py","NIfile.py","Scripts/LandscapeMovie.py","PyMRGraph/ActionStyle.py","Series.py","Modules/AnisTrajGL.ui","PyMRGraph/RDSMenu.py","ECF.py","PyQtRGraph/RPlotMenu.py","Helpers/step_helpers.py","PyMRGraph/shared.py","README.md","Helpers/Fourkas.py","ModuleDialog.py","PyMRGraph/PyQtRGraph.py","speeds.py","Modules/AnisTraj.py","PyQtWorker.py","Modules/Traj_corr.py","PyMRGraph/PyTabGraphMenu.py","PyQtRGraph/PyQtRds.py","MatrixDialog.py","Scripts/ShowPhi.py","PyMRGraph/PyQtRPlot.py","PyQtRGraph/PyQtGraphGrid.py","PyMRGraph/PyQtRGraphMenu.py","Modules/FKtraj.py","PyMRGraph/dsStyleMenu.py","Modules/AnisTrajGL.py","Helpers/ECF.py","Scripts/Peaks_moving.py","Fourkas.py","PyQtRod.py","PyMRGraph/PyQtRds.py","Modules/FKtraj.ui","form.ui","Helpers/speeds.py","NITab.ui","PyMRGraph/__init__.py","PyMRGraph/PyQtGraphGrid.py","Helpers/step_detect.py","PyQtFunc.py","__init__.py","PyQtRGraph/PyQtRPlot.py","Modules/AnisTraj.ui","PyQtRGraph/ActionStyle.py","step_detect.py","NIVisualizator.py","Helpers/ThetaPhiLine.py","Scripts/Speed.py","Scripts/Analysis/ECF_average_all.py","Scripts/ECF.py","Modules/FreqFFTNew.py","Scripts/HistogramFFT.py","Helpers/file_chunker.py","PyMRGraph/PyQtRViewBox.py","NITab.py","Modules/FreqFFT.py","Modules/ComputeCoeffs.ui","NIFolderTab.py","requirements.txt","Helpers/dwell_times.py"]
+    "files": [
+        "Scripts/MSDMovie.py",
+        "Scripts/MSD_speed.py",
+        "Scripts/Analysis/ECF_average.py",
+        "Scripts/allana.py",
+        "Scripts/LandscapeMovie.py",
+        "README.md",
+        "Scripts/ShowPhi.py",
+        "Scripts/Peaks_moving.py",
+        "Scripts/Speed.py",
+        "Scripts/Analysis/ECF_average_all.py",
+        "Scripts/ECF.py",
+        "Scripts/HistogramFFT.py",
+        "requirements.txt",
+        "Scripts/analysefiles.py",
+        "Scripts/computetrans.py",
+        "Scripts/speedoffiles.py",
+        "Scripts/analyse_all_transitions.py",
+        "src/pyqtrod/__init__.py",
+        "src/pyqtrod/form.ui",
+        "src/pyqtrod/main.py",
+        "src/pyqtrod/matrix_dialog.py",
+        "src/pyqtrod/module_dialog.py",
+        "src/pyqtrod/MR_jupyter.py",
+        "src/pyqtrod/ni_file.py",
+        "src/pyqtrod/ni_foldertab.py",
+        "src/pyqtrod/ni_tab.py",
+        "src/pyqtrod/ni_tab.ui",
+        "src/pyqtrod/ni_visualizator.py",
+        "src/pyqtrod/plot_tab.py",
+        "src/pyqtrod/pyqtfunc.py",
+        "src/pyqtrod/pyqtworker.py",
+        "src/pyqtrod/qpolygonF.py"
+    ]
 }

@@ -1,0 +1,27 @@
+[metadata]
+name = PyQtRod
+version = 0.1.0
+author = Martin Rieu
+author_email = martin.rieu@physics.ox.ac.uk
+description = Visualization software for polarization data of rotating nanomotors
+long_description = file: README.md
+long_description_content_type = text/markdown
+url = yourprojecturl.com
+classifiers =
+    Programming Language :: Python :: 3
+    Operating System :: OS Independent
+license_files = LICENSE
+
+[options]
+package_dir =
+    = src
+packages = find:
+
+[options.entry_points]
+console_scripts =
+    pyqtrod = pyqtrod.main:main
+
+
+[flake8]
+max-line-length = 88
+extend-ignore = E203, E704

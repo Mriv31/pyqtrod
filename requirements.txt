@@ -5,13 +5,13 @@ npTDMS
 numpy
 Pillow
 PyQt6
-pyqtgraph @ git+https://github.com/Mriv31/pyqtgraph@MRbds
+#pyqtgraph @ git+https://github.com/Mriv31/pyqtgraph@MRbds
+pyqtgraph
 scipy
 six
-#shiboken2
-#shiboken6
 statsmodels
 tqdm
 superqt
 PyQt6-Charts
 PyOpenGL
+scikit-learn

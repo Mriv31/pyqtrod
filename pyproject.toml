@@ -1,0 +1,57 @@
+[tool.poetry]
+name = "pyqtrod"
+version = "0.1.0"
+description = ""
+authors = ["Martin Rieu <martin.rieu@physics.ox.ac.uk>"]
+readme = "README.md"
+license ='GPL-3.0'
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^1.26.4"
+bottleneck = "^1.3.7"
+ipython = "^8.21.0"
+matplotlib = "^3.8.2"
+nptdms = "^1.8.0"
+pillow = "^10.2.0"
+pyqt6 = "^6.6.1"
+six = "^1.16.0"
+statsmodels = "^0.14.1"
+tqdm = "^4.66.1"
+superqt = "^0.6.1"
+pyqt6-charts = "^6.6.0"
+pyopengl = "^3.1.7"
+scikit-learn = "^1.4.0"
+pyqtgraph = "^0.13.3"
+
+[tool.poetry.scripts]
+pyqtrod = "pyqtrod.main:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+
+
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "E704"]
