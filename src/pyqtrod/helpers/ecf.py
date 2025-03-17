@@ -1,4 +1,4 @@
-import ray
+# import ray
 import numpy as np
 from tqdm import tqdm
 
@@ -39,7 +39,7 @@ def ECF_simple(
     return modelist, ftl, nstep, winlist
 
 
-@ray.remote
+# @ray.remote
 def processInput(phir, winlist, i):
     ftl_res = 0
     for win in winlist:

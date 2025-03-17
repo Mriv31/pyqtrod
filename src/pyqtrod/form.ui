@@ -57,6 +57,8 @@
     <addaction name="actionOpen_NPY_file"/>
     <addaction name="actionSave_graph_as_npz"/>
     <addaction name="actionOpen_npz"/>
+    <addaction name="actionCompute_phi_in_folder"/>
+    <addaction name="actionOpen_phiu_s_in_folder"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -83,6 +85,16 @@
   <action name="actionOpen_npz">
    <property name="text">
     <string>Open Npz ... </string>
+   </property>
+  </action>
+  <action name="actionCompute_phi_in_folder">
+   <property name="text">
+    <string>Compute phi in folder</string>
+   </property>
+  </action>
+  <action name="actionOpen_phiu_s_in_folder">
+   <property name="text">
+    <string>Open phiu's in folder</string>
    </property>
   </action>
  </widget>
@@ -168,6 +180,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionCompute_phi_in_folder</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>PhiFolder()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>329</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpen_phiu_s_in_folder</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_all_phiu()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>329</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadTDMS()</slot>
@@ -175,5 +219,7 @@
   <slot>OpenFile()</slot>
   <slot>saveAsNpz()</slot>
   <slot>LoadNpz()</slot>
+  <slot>PhiFolder()</slot>
+  <slot>open_all_phiu()</slot>
  </slots>
 </ui>

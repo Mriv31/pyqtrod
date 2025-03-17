@@ -10,7 +10,7 @@ import pyqtgraph as pg
 from pyqtgraph import mkColor
 from functools import partial
 from ..helpers.corr_matrix import Icor_matrix
-from ..helpers.fourkas import Fourkas_compItot
+from ..helpers.fourkas import Fourkas
 
 
 import importlib.resources as pkg_resources
@@ -191,9 +191,7 @@ class Traj_corr(QtWidgets.QWidget):
         c45 = bc[2, :]
         c135 = bc[3, :]
 
-        phi, theta1, theta2, Itots2thet, Itots2thet2, Itot, I135 = Fourkas_compItot(
-            c0, c90, c45, c135, NA=1.3, nw=1.33
-        )
+        phi, theta1 = Fourkas(c0, c90, c45, c135, NA=1.3, nw=1.33)
 
         self.theta1 = theta1
 

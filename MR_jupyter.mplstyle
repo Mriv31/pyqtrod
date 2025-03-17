@@ -2,7 +2,7 @@ xtick.color : black
 ytick.color : black
 axes.labelcolor : black
 axes.edgecolor : black
-axes.prop_cycle : cycler('color',['orange','lightseagreen', 'purple','777777','FBC15E'])
+axes.prop_cycle : cycler('color',['orange','lightseagreen', 'purple','777777','blue',"red"])
 
 mathtext.fontset : custom
 mathtext.rm : Arial

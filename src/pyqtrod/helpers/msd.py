@@ -11,6 +11,40 @@ def calculate_msd(trajectory, lags):
     return np.array(msd)
 
 
+def calculate_msd_non_overlapping(trajectory, lags):
+    msd = []
+    for t in lags:
+        segment_msd = []
+        for i in range(0, len(trajectory) - t, t):
+            displacement_squared = (trajectory[i + t] - trajectory[i]) ** 2
+            segment_msd.append(displacement_squared)
+        msd.append(segment_msd)
+    return msd
+
+
+def calculate_msd_statistics(trajectory, lags):
+    msd_mean = []
+    msd_std = []
+    msd_5th_percentile = []
+    msd_95th_percentile = []
+    length = []
+
+    for t in lags:
+        displacement_squared = (trajectory[t::t] - trajectory[:-t:t]) ** 2
+        msd_mean.append(np.mean(displacement_squared))
+        msd_std.append(np.std(displacement_squared))
+        msd_5th_percentile.append(np.percentile(displacement_squared, 5))
+        msd_95th_percentile.append(np.percentile(displacement_squared, 95))
+        length.append(len(displacement_squared))
+    return (
+        np.array(msd_mean),
+        np.array(msd_std),
+        np.array(msd_5th_percentile),
+        np.array(msd_95th_percentile),
+        np.array(length),
+    )
+
+
 def calculate_ssd(trajectory, lags):
     ssd = []
     for t in lags:

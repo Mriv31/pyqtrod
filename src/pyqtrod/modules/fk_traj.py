@@ -78,25 +78,35 @@ class FKtraj(QtWidgets.QWidget):
             return int(filename.split("_")[1].split(".")[0])
 
         f = self.NITab.NIf
-        folder = f.path[:-5] + "_analysis/transitions/"
+        folder = QtWidgets.QFileDialog.getExistingDirectory(
+            None, "Select a folder", os.path.dirname(f.path)
+        )
         if os.path.isdir(folder) == 0:
             return
+
         fl = os.listdir(folder)
+        # fl.remove("transitionsHD.npz")
+        # fl.remove("homogeneized_transition")
+        # fl.remove("homogeneized_transition_quality_checked")
+        print(fl)
         fl = sorted(fl, key=extract_integer)
+
         mt = np.empty([])
         xt = np.empty([])
+        startind = self.start * f.freq
+        print(self.start)
         for fi in fl:
             print(fi)
-            tr = np.load(folder + fi)
+            tr = np.load(os.path.join(folder, fi))
             m = tr["m"] * 180 / np.pi
 
             xbound = tr["xbound"]
-            indphi = int((xbound[0] - self.NITab.NIf.time_off) * self.NITab.NIf.freq)
-            if (indphi < self.start) or (indphi > self.stop):
+            indphi = int((xbound[0]) * self.NITab.NIf.freq)
+            ind = int((indphi - startind) // self.NITab.NIf.dec)
+            print(xbound[0], ind)
+            if ind < 0 or ind >= len(self.phi):
                 continue
-            nextvalue = (
-                self.phi[(indphi - self.start) // self.NITab.NIf.dec] * 180 / np.pi
-            )
+            nextvalue = self.phi[ind] * 180 / np.pi
             print(nextvalue, m[0])
             mh = m[0]
             i = 0
@@ -127,6 +137,7 @@ class FKtraj(QtWidgets.QWidget):
 
     def set_start(self, x):
         self.start = x
+        print("set start", x)
 
     def set_stop(self, x):
         self.stop = x
@@ -181,15 +192,7 @@ class FKtraj(QtWidgets.QWidget):
         progress_callback.emit(30)
 
         if (self.stop - self.start) / self.NITab.NIf.dec < self.maxlength:
-            (
-                phi,
-                theta1,
-                _,
-                _,
-                _,
-                _,
-                _,
-            ) = self.NITab.NIf.ret_all_var(
+            (phi, theta1) = self.NITab.NIf.ret_all_var(
                 self.start, self.stop, phiraw=self.rawdatabutton.isChecked()
             )
             self.theta1 = theta1
@@ -333,8 +336,13 @@ class FKtraj(QtWidgets.QWidget):
         self.playbutton.setEnabled(True)
 
     def display_convolution_speed(self):
+
+        diff_length = -len(self.speed_phi) + len(self.xs)
+        assert diff_length >= 0
+        diff_length_2 = diff_length // 2
+
         self.NITab.plot(
-            self.xs,
+            self.xs[diff_length_2 : diff_length_2 + len(self.speed_phi)],
             self.speed_phi * self.NITab.NIf.freq / 2 / np.pi,
             title="FIR derivative of phi",
             xtitle="Time (s)",
@@ -353,4 +361,5 @@ class FKtraj(QtWidgets.QWidget):
             symbolSize=2,
             symbol="o",
             symbolBrush="black",
+            xArrayLinSorted=True,
         )

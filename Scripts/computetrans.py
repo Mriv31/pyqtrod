@@ -1,32 +1,12 @@
 import numpy as np
-import multiprocessing
+from pyqtrod.ni_file import NIfile
+from pyqtrod.helpers.compute_transitions import compute_transitions
+import os
 
+import pandas as pd
 
 if __name__ == "__main__":
-    import sys, os, glob
-
-    sys.path.insert(0, os.path.join(os.path.dirname(sys.path[0]), "Helpers"))
-    sys.path.insert(0, os.path.dirname(sys.path[0]))
-
-    from NIfile import NIfile
-    import re
-
-    from matplotlib import pyplot as plt
-    import matplotlib.image as mpimg
-    from scipy import ndimage
-    from correction_linearity import *  # or whatever name you want.
-    from ECF import *
-    import pandas as pd
-    from scipy import ndimage, signal
-    from sklearn.neighbors import KernelDensity
-
-    plt.style.use(
-        "Y:/Martin Rieu/Post-Doc/datoviz/PyQtRod/mr_widget.mplstyle"
-    )  # my own style, can remove
-    from compute_transitions import *
-
     xlsx_file_path = "Y:/Martin Rieu/datasummary.xlsx"
-    foldersave = "C:/Users/rieu/OneDrive - Nexus365/paper1/Figure 2/"
     dec = 1
     df = pd.read_excel(xlsx_file_path)
 
@@ -46,16 +26,30 @@ for index, row in df.iterrows():
     )
     if os.path.isdir(save_folder) == 0:
         os.mkdir(save_folder)
+    xar = None
+    peaks = None
+    fit = None
+    raw = 1
+    if row["c2"] == "PotAb cell 1":
+        data = np.load("C:/Users/rieu/OneDrive - Nexus365/paper1/PotAB_cell1_peaks.npz")
+        xar = data["xar"]
+        peaks = data["peaks"]
+        raw = 0
+        fit = data["fit"]
+    else:
+        continue
     f = NIfile(tdmspath, dec=1)
-    lt = len(f.channels[0]) / f.freq - 5
+    lt = f.datasize / f.freq - 5
     win = 10
     start = row["Start"]
-    stop = win
+    stop = start + win
     while stop < lt:
         print(tdmspath, start, stop)
-        phiu = f.ret_phi(int(start * f.freq), int(stop * f.freq), raw=1)
-        xt = np.linspace(start, np.min([stop, len(f.channels[0])]), len(phiu))
+        phiu = f.ret_phi(int(start * f.freq), int(stop * f.freq), raw=raw)
+        xt = np.linspace(start, np.min([stop, f.datasize / f.freq]), len(phiu))
         of = save_folder + f"trans_{start}_to_{stop}.npz"
-        compute_transitions(of, xt, phiu, None, None, pen=0.1, min_segment_size=5)
+        compute_transitions(
+            of, xt, phiu, xar=xar, peaks=peaks, fit=fit, pen=0.1, min_segment_size=5
+        )
         start += win
         stop += win

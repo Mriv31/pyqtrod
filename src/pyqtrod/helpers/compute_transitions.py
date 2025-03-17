@@ -4,51 +4,8 @@ from sklearn.neighbors import KernelDensity
 from scipy import signal
 
 
-def replace_with_closest(X, L):
-    Li = np.argmin(np.abs(L[:, np.newaxis] - X % (2 * np.pi)), axis=0)
-    closest_values = L[Li] + np.round((X - L[Li]) / (2 * np.pi)) * (2 * np.pi)
-    return closest_values, Li
+def compute_transition_arrays(xboundh, xboundrawh, indlih, peaks, zi, xi):
 
-
-def compute_transitions(output, xi, zi, xar, peaks, pen=0.1, min_segment_size=5):
-    if xar is None:
-        window = (1.0 / 100) * np.ones(100)
-        X = np.convolve(zi, window, mode="valid")[::100]
-
-        X = X % (2 * np.pi)
-        X = X[:, np.newaxis]
-        sh = 0
-        sth = 2 * np.pi
-        kde = KernelDensity(kernel="gaussian", bandwidth=0.012).fit(X)
-        xar = np.arange(sh, sth, 0.01)
-        fit = np.exp(kde.score_samples(xar[:, np.newaxis]))
-        peaks = signal.find_peaks(fit, prominence=0.01)
-        peaks = peaks[0]
-
-    xboundori, mori, xboundrawori = get_ruptures_mm(
-        xi,
-        zi,
-        min_size=min_segment_size,
-        min_deg_size=5,
-        penalty_value=pen,
-        show=0,
-        showstepvalue=0,
-        showstep=0,
-        dpi=100,
-    )
-    mh, indlih = replace_with_closest(np.array(mori), xar[peaks])
-    inda = np.where(np.diff(indlih) == 0)[0]
-    indlih = np.delete(indlih, inda)
-    mh = np.delete(mh, inda)
-    xboundh = np.delete(xboundori, inda)
-    xboundrawh = np.delete(xboundrawori, inda)
-    diss = []
-    for i in range(len(xboundh) - 1):
-        inds = xboundrawh[i]
-        inde = xboundrawh[i + 1]
-        ma = np.mean(zi[inds:inde] - mh[i + 1])
-        diss.append(ma)
-    diss = []
     transitionarh = np.empty([len(peaks), len(peaks)], dtype=object)
     xbounddiffh = np.diff(xboundh)
 
@@ -133,9 +90,64 @@ def compute_transitions(output, xi, zi, xar, peaks, pen=0.1, min_segment_size=5)
                         np.average(meanzh[i, j][k], weights=durationsh[i, j][k])
                     )
                     meantimeh[i, j].append(np.average(xi[rawtrh[i, j][k]]))
-    # plt.plot(xi,zi,".",ms=)
-    # plt.step(xboundh,mh,color="red",linewidth=1)
-    # plt.show()
+
+    return transitionarh, meanallh, meantimeh, meanzh, timessh, durationsh, rawtrh
+
+
+def replace_with_closest(X, L):
+    """
+    Replace each element in X with the closest element in L, considering periodicity.
+
+    Parameters:
+    X (array-like): Array of values to be replaced.
+    L (array-like): Array of reference values.
+
+    Returns:
+    tuple: A tuple containing:
+        - closest_values (array-like): Array of closest values from L.
+        - Li (array-like): Indices of the closest values in L.
+    """
+    Li = np.argmin(np.abs(L[:, np.newaxis] - X % (2 * np.pi)), axis=0)
+    closest_values = L[Li] + np.round((X - L[Li]) / (2 * np.pi)) * (2 * np.pi)
+    return closest_values, Li
+
+
+def compute_transitions(output, xi, zi, xar, peaks, fit, pen=0.1, min_segment_size=5):
+    if xar is None or peaks is None or fit is None:
+        window = (1.0 / 100) * np.ones(100)
+        X = np.convolve(zi, window, mode="valid")[::100]
+
+        X = X % (2 * np.pi)
+        X = X[:, np.newaxis]
+        sh = 0
+        sth = 2 * np.pi
+        kde = KernelDensity(kernel="gaussian", bandwidth=0.012).fit(X)
+        xar = np.arange(sh, sth, 0.01)
+        fit = np.exp(kde.score_samples(xar[:, np.newaxis]))
+        peaks = signal.find_peaks(fit, prominence=0.01)
+        peaks = peaks[0]
+
+    xboundori, mori, xboundrawori = get_ruptures_mm(
+        xi,
+        zi,
+        min_size=min_segment_size,
+        min_deg_size=5,
+        penalty_value=pen,
+        show=0,
+        showstepvalue=0,
+        showstep=0,
+        dpi=100,
+    )
+    mh, indlih = replace_with_closest(np.array(mori), xar[peaks])
+    inda = np.where(np.diff(indlih) == 0)[0]
+    indlih = np.delete(indlih, inda)
+    mh = np.delete(mh, inda)
+    xboundh = np.delete(xboundori, inda)
+    xboundrawh = np.delete(xboundrawori, inda)
+
+    transitionarh, meanallh, meantimeh, meanzh, timessh, durationsh, rawtrh = (
+        compute_transition_arrays(xboundh, xboundrawh, indlih, peaks, xi, zi)
+    )
     np.savez(
         output,
         transitionar=transitionarh,

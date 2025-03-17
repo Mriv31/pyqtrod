@@ -31,6 +31,19 @@
         "src/pyqtrod/plot_tab.py",
         "src/pyqtrod/pyqtfunc.py",
         "src/pyqtrod/pyqtworker.py",
-        "src/pyqtrod/qpolygonF.py"
+        "src/pyqtrod/qpolygonF.py",
+        "src/pyqtrod/modules/__init__.py",
+        "src/pyqtrod/modules/anis_traj_gl.py",
+        "src/pyqtrod/modules/anis_traj_gl.ui",
+        "src/pyqtrod/modules/compute_coeffs.py",
+        "src/pyqtrod/modules/compute_coeffs.ui",
+        "src/pyqtrod/modules/fk_traj.py",
+        "src/pyqtrod/modules/fk_traj.ui",
+        "src/pyqtrod/modules/freq_fft.py",
+        "src/pyqtrod/modules/freq_fft.ui",
+        "src/pyqtrod/modules/freq_wavelet.py",
+        "src/pyqtrod/modules/traj_corr__.py",
+        "src/pyqtrod/modules/traj_corr__.ui",
+        "src/pyqtrod/modules/freq_wavelet.ui"
     ]
 }

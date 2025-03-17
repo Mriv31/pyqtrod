@@ -16,7 +16,7 @@ def correct_on_speed_step(
     if show:
         plt.figure()
         plt.plot(
-            np.array(m[:-2]) % (2 * np.pi),
+            np.array(m[1:]) % (2 * np.pi),
             speeds,
             ".",
             markersize=1,

@@ -7,7 +7,7 @@ def comp_phiu(c0, c90, c45, c135):
     return np.unwrap(phi, period=np.pi)
 
 
-def Fourkas(c0, c90, c45, c135, theta0=0, phi0=0, NA=1.3, nw=1.33, tweaktheta=1):
+def Fourkas(c0, c90, c45, c135, NA=1.3, nw=1.33, tweaktheta=1):
     alpha = np.arcsin(NA / nw)
     A = 1 / 6 - 1 / 4 * np.cos(alpha) + 1 / 12 * np.cos(alpha) ** 3
     B = 1 / 8 * np.cos(alpha) - 1 / 8 * np.cos(alpha) ** 3
@@ -17,16 +17,22 @@ def Fourkas(c0, c90, c45, c135, theta0=0, phi0=0, NA=1.3, nw=1.33, tweaktheta=1)
     )  # thhis one I modified to symmetrize
 
     cs = np.cos(2 * phi)
-    Itots2thet = 1 / 2 / A * ((1 - B / C / cs) * c0 + (1 + B / C / cs) * c90)
+    ss = np.sin(2 * phi)
 
-    theta1 = np.arcsin(np.sqrt((c0 - c90) / (2 * tweaktheta * Itots2thet * C * cs)))
+    OP = c0 + c45 + c90 + c135
+    P = c0 - c90 + c45 - c135
 
-    Itot = Itots2thet / np.sin(theta1) ** 2
+    sinsqtheta = 4 * A * P / (2 * (ss + cs) * OP * C - 4 * B * P)
+    test = np.sqrt(
+        np.abs(sinsqtheta)
+    )  # raise a warning in case abs is used / it should not
+    test = np.where(test > 1, 1, test)
+    theta1 = np.arcsin(test)
+    return phi, theta1
 
-    return phi, theta1, Itots2thet, Itot
 
-
-# standard Fourkas with tweaktheta, compute expected I135 from I0, I45, I90, but actually dins I0+I90-I45
+# standard Fourkas with tweaktheta,
+# compute expected I135 from I0, I45, I90, but actually dins I0+I90-I45
 def Fourkas_compItot(
     c0,
     c90,

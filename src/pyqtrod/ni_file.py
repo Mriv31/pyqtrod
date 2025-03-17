@@ -2,7 +2,7 @@
 import numpy as np
 from nptdms import TdmsFile
 from .helpers.corr_matrix import T_Icor_Matrix, find_best_coeff_using_mat
-from .helpers.fourkas import Fourkas_compItot, comp_phiu
+from .helpers.fourkas import Fourkas, comp_phiu
 from .helpers.correction_linearity import correct_on_diff, set_fcor_from_array
 import os
 import threading
@@ -12,7 +12,13 @@ class NIfile:
     n_signals = 4
 
     def __init__(
-        self, path, max_size=1000000000, dec=1, indstart=0, rawoptics=0, decref=200
+        self,
+        path,
+        max_size=1000000000,
+        dec=1,
+        rawoptics=0,
+        decref=200,
+        ignore_correction=0,
     ):
         self.path = path
         self.tdms_lock = threading.Lock()
@@ -34,7 +40,7 @@ class NIfile:
                 self.starttime = self._channels[0].properties["wf_start_time"]
                 self.freq = 1 / self.time_inc
 
-            except ValueError:
+            except KeyError:
                 self.time_inc = 4e-6
                 self.freq = 1 / self.time_inc
                 self.time_off = 0
@@ -45,7 +51,7 @@ class NIfile:
             raise ValueError("Problem loading file " + path)
         self.center = -1
         self.dec_average = False
-        self.a = [1, 1, 1, 1]
+        self.a = [1, 1.2, 1, 1]
         self.b = [0, 0, 0, 0]
 
         self.fcor = None  # defaut correction function is one
@@ -57,16 +63,15 @@ class NIfile:
 
         self.init_data_share(dec)
 
-        if not rawoptics:
-            self.correct_channels(
-                int(self.datasize / 2), int(self.datasize / 2) + 100000
-            )
-            self.init_phi_ref(decref)
+        if not ignore_correction:
+            self.correct_channels(1000, 100000)
+        self.init_phi_ref(decref)
 
     # The functions in this section do not depend on data share function and
     # preallocated self.data variable used for visualization. Note that decimation
 
     def get_pol_ind(self, listpol):
+        # return a list of indices corresponding to the orientations in listpol
         indlist = []
         for i in range(len(listpol)):
             for j in range(len(self.orientations)):
@@ -76,6 +81,9 @@ class NIfile:
         return indlist
 
     def init_phi_ref(self, decref):
+        """
+        Initialize the reference for the phase unwrapping
+        """
         if os.path.isfile(self.path[:-5] + "_phiref.npy"):
             res = np.load(self.path[:-5] + "_phiref.npy")
             self.phi_ref = res[1, :]
@@ -91,6 +99,9 @@ class NIfile:
             )
 
     def ret_index_by_pol(self, pol):
+        """
+        Return the index of the channel corresponding to the orientation pol
+        """
         for i in range(len(self.orientations)):
             if self.orientations[i] == pol:
                 return i
@@ -110,9 +121,13 @@ class NIfile:
         np.save(self.path[:-5] + "_chcor.npy", self.a)
         print("Channel corrections SAVED TO file")
 
-    def correct_channels(self, start, stop):  # No decimation or data share
+    def correct_channels(self, start, stop, force=False):  # No decimation or data share
+        """
+        Correct the channels using the matrix matcorb
+        It directly reads the data from the file
+        """
         c0, c90, c45, c135 = self.ret_raw_channels(start, stop)
-        if os.path.isfile(self.path[:-5] + "_chcor.npy"):
+        if os.path.isfile(self.path[:-5] + "_chcor.npy") and not force:
             arf = np.load(self.path[:-5] + "_chcor.npy")
             self.a = arf
             # rfprint("Channel corrections set FROM file",a[0],a[1],a[2],a[3])
@@ -131,18 +146,54 @@ class NIfile:
         self.update_data_from_file(time=-2)
 
     def ret_cor_channel_in_file(
-        self, start, stop, ordl=["0", "90", "45", "135"]
-    ):  # No  data share, will read into the file directly
+        self,
+        start,
+        stop,
+        ordl=["0", "90", "45", "135"],
+        average=False,
+        average_window=100,
+        dec=None,
+    ):
+        """
+        Correct the channels using the matrix matcor
+        and the corrections a and b
+        It directly reads the data from the file
+        """
+        if dec is None:
+            dec = self.dec
         self.tdms_lock.acquire()
         # to avoid several threads to access the tdms file at the same time
-        m1 = self.b[0] + self.a[0] * self._channels[0][start : stop : self.dec]
-        data = np.zeros([4, len(m1)])
-        data[0, :] = m1
+        if average is False:
+            m1 = self.b[0] + self.a[0] * self._channels[0][start:stop:dec]
+            data = np.zeros([4, len(m1)])
+            data[0, :] = m1
 
-        for i in range(1, self.n_signals):
-            data[i, :] = (
-                self.b[i] + self.a[i] * self._channels[i][start : stop : self.dec]
+            for i in range(1, self.n_signals):
+                data[i, :] = self.b[i] + self.a[i] * self._channels[i][start:stop:dec]
+        else:
+            m1 = (
+                self.b[0]
+                + self.a[0]
+                * np.convolve(
+                    self._channels[0][start:stop],
+                    np.ones((average_window,)) / average_window,
+                    mode="valid",
+                )[::dec]
             )
+            data = np.zeros([4, len(m1)])
+            data[0, :] = m1
+
+            for i in range(1, self.n_signals):
+                data[i, :] = (
+                    self.b[i]
+                    + self.a[i]
+                    * np.convolve(
+                        self._channels[i][start:stop],
+                        np.ones((average_window,)) / average_window,
+                        mode="valid",
+                    )[::dec]
+                )
+
         self.tdms_lock.release()
 
         data = np.dot(self.matcor, data)
@@ -154,9 +205,12 @@ class NIfile:
             data[index[3], :],
         )
 
-    def ret_cor_channel(
-        self, start, stop, ordl=["0", "90", "45", "135"]
-    ):  # Will read from the data share, no need to access the file
+    def ret_cor_channel(self, start, stop, ordl=["0", "90", "45", "135"]):
+        """
+        Correct the channels using the matrix matcor
+        and the corrections a and b
+        It reads the data from the DATA SHARE
+        """
         stindex, stopindex = self.time_to_index_in_mem([start, stop])
         data = self.data[:, stindex:stopindex]
         index = self.get_pol_ind(ordl)
@@ -171,9 +225,11 @@ class NIfile:
         stindex, stopindex = self.time_to_index_in_mem([start, stop])
         return self.xs[stindex:stopindex]
 
-    def ret_raw_channel(
-        self, start, stop, ordl=["0", "90", "45", "135"]
-    ):  # Will read from the data share, no need to access the file
+    def ret_raw_channel(self, start, stop, ordl=["0", "90", "45", "135"]):
+        """
+        Return the raw channels without any correction
+        Directly reads the data from the file
+        """
         stindex = self.time_to_index_in_file([start, stop])
         staindex = stindex[0]
         stopindex = stindex[1]
@@ -186,9 +242,11 @@ class NIfile:
             self._channels[index[3]][staindex:stopindex],
         )
 
-    def set_fcor(self, phiu):
-        if os.path.isfile(self.path[:-5] + "_fcor.npy") and os.path.isfile(
-            self.path[:-5] + "_phiref.npy"
+    def set_fcor(self, phiu, force=0):
+        if (
+            os.path.isfile(self.path[:-5] + "_fcor.npy")
+            and os.path.isfile(self.path[:-5] + "_phiref.npy")
+            and force == 0
         ):
             arf = np.load(self.path[:-5] + "_fcor.npy")
 
@@ -205,17 +263,44 @@ class NIfile:
             np.save(self.path[:-5] + "_fcor.npy", arf)
             print("Linearity correction SAVED TO file")
 
-    def ret_phi(self, start, stop, raw=0, init=0, cutwindow=None):
+    def ret_phi(
+        self,
+        start,
+        stop,
+        raw=0,
+        init=0,
+        cutwindow=None,
+        force_ref=0,
+        average_before=False,
+        average_before_window=100,
+        average_before_dec=1,
+    ):
+        """
+        Reads the unwrapped phase from the file
+        Uses matrix matcor to correct the channels and correction a and b
+        Corrected for linearity if raw=0
+        """
         if cutwindow is not None:
             phiu = np.empty([])
             windowrange = np.arange(start, stop, cutwindow).astype("int")
             for w in windowrange:
                 c0, c90, c45, c135 = self.ret_cor_channel_in_file(
-                    w, np.min([w + cutwindow, stop])
+                    w,
+                    np.min([w + cutwindow, stop]),
+                    average=average_before,
+                    average_window=average_before_window,
+                    dec=average_before_dec if average_before else None,
                 )
+
                 phiu = np.hstack((phiu, comp_phiu(c0, c90, c45, c135)))
         else:
-            c0, c90, c45, c135 = self.ret_cor_channel_in_file(start, stop)
+            c0, c90, c45, c135 = self.ret_cor_channel_in_file(
+                start,
+                stop,
+                average=average_before,
+                average_window=average_before_window,
+                dec=average_before_dec if average_before else None,
+            )
             phiu = comp_phiu(c0, c90, c45, c135)
 
         if (
@@ -227,8 +312,7 @@ class NIfile:
                 phiu += np.pi
 
         if raw == 0:  # this is the non linearity
-            if self.fcor is None:
-                self.set_fcor(phiu=phiu)
+            self.set_fcor(phiu=phiu, force=force_ref)
             phir = phiu % (2 * np.pi)
             phirc = self.fcor(phir)
             phiu = np.unwrap(phirc, period=np.pi)
@@ -238,10 +322,12 @@ class NIfile:
         return phiu
 
     def ret_all_var(self, start, stop, phiraw=0):
+        """
+        Return the unwrapped phase, the theta1
+        Reads from loaded data
+        """
         c0, c90, c45, c135 = self.ret_cor_channel(start, stop)
-        phiu, theta1, theta2, Itots2thet, Itots2thet2, Itot, I135 = Fourkas_compItot(
-            c0, c90, c45, c135, NA=1.3, nw=1.33
-        )
+        phiu, theta1 = Fourkas(c0, c90, c45, c135, NA=1.3, nw=1.33)
         ref = np.interp(start, self.ind_ref, self.phi_ref)
         print(np.abs(phiu[0] % (2 * np.pi) - ref % (2 * np.pi)))
         if np.abs(phiu[0] % (2 * np.pi) - ref % (2 * np.pi)) > np.pi / 2:
@@ -256,7 +342,7 @@ class NIfile:
         else:
             phiu = np.unwrap(phiu, period=np.pi)
 
-        return phiu, theta1, theta2, Itots2thet, Itots2thet2, Itot, I135
+        return phiu, theta1
 
     def ret_raw_channels(
         self, start, stop, ordl=["0", "90", "45", "135"], data=None
